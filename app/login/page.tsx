@@ -6,15 +6,21 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
-import {useState} from "react";
+import { useState } from "react";
+import { useSearchParams } from "next/navigation"
 
 export default function Login() {
+
+    const searchParams = useSearchParams();
+    const callbackUrl = searchParams.get('callbackUrl') || '/'
+    const inviteId = searchParams.get('inviteId') || '';
+
 
     const [isLoading, setIsLoading] = useState<boolean>(false)
     const [message, setMessage] = useState<string>('')
 
 
-    const handleLogin = async (e:any) => {
+    const handleLogin = async (e: any) => {
         e.preventDefault();
         const email = e.target.email.value;
         const password = e.target.password.value;
@@ -28,7 +34,7 @@ export default function Login() {
         if (result?.error) {
             console.log(result.error);
         } else {
-            window.location.href = '/'; // Redirect after successful login
+            window.location.href = callbackUrl; // Redirect after successful login
         }
     };
 
@@ -44,8 +50,8 @@ export default function Login() {
         const response = await fetch('/api/register', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name, email, password }),
-        })
+            body: JSON.stringify({ name, email, password, inviteId }),
+        });
 
         const result = await response.json()
         setIsLoading(false)

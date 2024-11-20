@@ -6,9 +6,23 @@ export async function GET(req: NextRequest, { params }) {
 
     try {
         const event = await prisma.event.findUnique({
-            where: { id },
-            include: { expenses: true },
+            where: { id: id }, // Replace eventId with your dynamic value
+            include: {
+                expenses: {
+                    include: {
+                        user: { // Include the user who added the expense
+                            select: {
+                                id: true,
+                                name: true,
+                                email: true, // Include other fields as needed
+                            },
+                        },
+                    },
+                },
+            },
         });
+
+        console.log(event)
 
         if (!event) {
             return NextResponse.json({ error: 'Event not found' }, { status: 404 });

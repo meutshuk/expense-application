@@ -3,6 +3,9 @@
 import { useSession, signIn, signOut, SessionProvider } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 import Link from 'next/link'
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 
 type Event = {
   id: string;
@@ -12,7 +15,7 @@ type Event = {
 
 export default function HomePage() {
 
-  const [events, setEvents] = useState<Event[]>([])
+  const [events, setEvents] = useState<any[]>([])
   const { data: session } = useSession();
 
   // console.log(session)
@@ -61,9 +64,9 @@ export default function HomePage() {
         throw new Error(errorData.error || 'Failed to create event');
       }
 
-      const newEvent = await response.json(); // Parse the response JSON
-      console.log('New event:', newEvent); // Debugging the response
-      setEvents((prev) => [...prev, newEvent]);
+
+
+
       setEventName('');
     } catch (error) {
       console.error('Error creating event:', error);
@@ -77,33 +80,46 @@ export default function HomePage() {
     <SessionProvider>
 
       <div>
-        <h1>Home</h1>
+        <h1 className="text-3xl font-bold mb-8">Your Events</h1>
 
-        {/* Form to create an event */}
-        <div>
-          <input
-            type="text"
-            placeholder="Event Name"
-            value={eventName}
-            onChange={(e) => setEventName(e.target.value)}
-          />
-          <button onClick={handleCreateEvent} disabled={loading}>
-            {loading ? 'Creating...' : 'Create Event'}
-          </button>
+        <div className="mb-8">
+          <div className="flex gap-4">
+            <Input
+              type="text"
+              placeholder="Event Name"
+              value={eventName}
+              onChange={(e) => setEventName(e.target.value)}
+              className="flex-grow"
+            />
+            <Button onClick={handleCreateEvent} disabled={loading}>
+              {loading ? 'Creating...' : 'Create Event'}
+            </Button>
+          </div>
         </div>
 
-        {/* List of events */}
-        <div>
-          <h2>Your Events</h2>
-          <ul>
-            {events.map((event) => (
-              <li key={event.id}>
-                <Link href={`/events/${event.id}`}>
-                  {event.name}
-                </Link>
-              </li>
-            ))}
-          </ul>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {events.map(({ event, role }) => (
+            <Card key={event.id} className="overflow-hidden">
+              <CardHeader className="p-0">
+                <div className="bg-gray-200 h-48 flex items-center justify-center">
+                  <div className="w-12 h-12 bg-gray-50" />
+                </div>
+              </CardHeader>
+              <CardContent className="p-4">
+                <CardTitle className="mb-2">
+                  <Link href={`/events/${event.id}`} className="text-blue-600 hover:underline">
+                    {event.name}
+                  </Link>
+                </CardTitle>
+                <p className="text-sm text-gray-600">Created: {new Date(event.createdAt).toLocaleDateString()}</p>
+              </CardContent>
+              <CardFooter className="bg-gray-50 p-4">
+                <Button asChild>
+                  <Link href={`/events/${event.id}`}>View Details</Link>
+                </Button>
+              </CardFooter>
+            </Card>
+          ))}
         </div>
       </div>
     </SessionProvider>
