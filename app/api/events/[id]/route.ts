@@ -22,13 +22,16 @@ export async function GET(req: NextRequest, { params }) {
             },
         });
 
-        console.log(event)
+        // Fetch calculation history
+        const calculationHistory = await prisma.eventCalculationHistory.findMany({
+            where: { eventId: id },
+        });
 
         if (!event) {
             return NextResponse.json({ error: 'Event not found' }, { status: 404 });
         }
 
-        return NextResponse.json(event);
+        return NextResponse.json({ event, calculationHistory });
     } catch (error) {
         console.error('Error fetching event:', error);
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });

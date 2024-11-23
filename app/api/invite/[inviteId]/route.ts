@@ -7,7 +7,11 @@ export async function GET(req: NextRequest, { params }: { params: { inviteId: st
     try {
         const invite = await prisma.invitedUser.findUnique({
             where: { id: inviteId },
+            include: {
+                event: true
+            }
         });
+
 
         if (!invite) {
             return NextResponse.json({ error: 'Invitation not found' }, { status: 404 });

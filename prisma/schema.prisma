@@ -25,15 +25,16 @@ model User {
 }
 
 model Event {
-  id          String        @id @default(cuid())
-  name        String
-  creatorId   String
-  creator     User          @relation(fields: [creatorId], references: [id]) // Event creator
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  users       UserEvent[] // Relationship to the UserEvent join table
-  invitedUser InvitedUser[]
-  expenses    Expense[]
+  id                 String                    @id @default(cuid())
+  name               String
+  creatorId          String
+  creator            User                      @relation(fields: [creatorId], references: [id]) // Event creator
+  createdAt          DateTime                  @default(now())
+  updatedAt          DateTime                  @updatedAt
+  users              UserEvent[] // Relationship to the UserEvent join table
+  expenses           Expense[]
+  invitedUser        InvitedUser[]
+  calculationHistory EventCalculationHistory[]
 }
 
 model UserEvent {
@@ -50,11 +51,11 @@ model UserEvent {
 }
 
 model InvitedUser {
-  id      String @id @default(cuid())
-  email   String @unique
-  eventId String
-  event   Event  @relation(fields: [eventId], references: [id])
-  token   String
+  id        String   @id @default(cuid())
+  email     String
+  eventId   String
+  expiresAt DateTime
+  event     Event    @relation(fields: [eventId], references: [id])
 }
 
 model Expense {
@@ -66,4 +67,18 @@ model Expense {
   user      User     @relation(fields: [addedBy], references: [id])
   createdAt DateTime @default(now())
   event     Event    @relation(fields: [eventId], references: [id])
+
+  calculated         Boolean                   @default(false)
+  calculationHistory EventCalculationHistory[]
+}
+
+model EventCalculationHistory {
+  id        String   @id @default(cuid())
+  eventId   String
+  expenseId String // Tracks the last expense included in the calculation
+  date      DateTime @default(now())
+  history   Json // Stores "who owed whom" information in JSON format
+
+  event   Event   @relation(fields: [eventId], references: [id])
+  expense Expense @relation(fields: [expenseId], references: [id])
 }

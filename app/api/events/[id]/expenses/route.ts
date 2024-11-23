@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest, { params }) {
     const { id } = await params;
+
     const { name, amount } = await req.json();
 
     const session = await getServerSession(authOptions);
@@ -14,7 +15,7 @@ export async function POST(req: NextRequest, { params }) {
 
     const userId = session.user.id;
 
-    console.log(name, amount)
+
 
     try {
         const expense = await prisma.expense.create({

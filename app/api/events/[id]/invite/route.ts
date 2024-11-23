@@ -1,14 +1,18 @@
 import prisma from '@/lib/prisma';
 import { NextRequest, NextResponse } from 'next/server';
 
-
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
-    const { id: eventId } = await params;
-    const { email } = await req.json();
-    console.log(email)
-
     try {
-        // Calculate expiry date
+        const { id: eventId } = await params; // Extract event ID from route params
+        const { email } = await req.json(); // Extract email from request body
+
+
+        // Validate input
+        if (!email || !eventId) {
+            return NextResponse.json({ error: 'Missing email or event ID' }, { status: 400 });
+        }
+
+        // Calculate expiry date (24 hours from now)
         const expiresAt = new Date();
         expiresAt.setHours(expiresAt.getHours() + 24);
 
@@ -17,17 +21,22 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
             data: {
                 email,
                 eventId,
+                expiresAt,
             },
         });
+
         // Generate the invitation link
         const inviteLink = `${process.env.NEXT_PUBLIC_APP_URL}/invite/${invite.id}`;
 
-        // Log the link (replace this with email sending logic later)
+        // Log the invitation details
         console.log(`Invite sent to ${email} for event ${eventId}`);
         console.log(`Invitation link: ${inviteLink}`);
 
-
-        return NextResponse.json({ message: `Invite sent to ${email}` });
+        // Return the invite link in the response
+        return NextResponse.json({
+            message: `Invite sent to ${email}`,
+            inviteLink,
+        });
     } catch (error) {
         console.error('Error inviting user:', error);
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });

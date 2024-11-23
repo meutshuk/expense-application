@@ -39,7 +39,6 @@ export async function POST(req: NextRequest) {
 export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const userId = searchParams.get('userId');
-    // console.log(userId)
     if (!userId) {
         return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
     }
@@ -59,7 +58,6 @@ export async function GET(req: NextRequest) {
             role: userEvent.role,
         }));
 
-        console.log(eventsWithRoles)
 
         return NextResponse.json(eventsWithRoles);
     } catch (error) {

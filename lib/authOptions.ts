@@ -38,7 +38,7 @@ export const authOptions: AuthOptions = {
                     throw new Error('Invalid password');
                 }
 
-                console.log(user)
+
                 return {
                     id: user.id,
                     name: user.name,

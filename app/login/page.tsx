@@ -32,7 +32,7 @@ export default function Login() {
         });
 
         if (result?.error) {
-            console.log(result.error);
+
         } else {
             window.location.href = callbackUrl; // Redirect after successful login
         }
