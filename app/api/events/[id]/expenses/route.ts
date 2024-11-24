@@ -7,6 +7,8 @@ export async function POST(req: NextRequest, { params }) {
     const { id } = await params;
 
     const { name, amount } = await req.json();
+    console.log(name, amount)
+
 
     const session = await getServerSession(authOptions);
     if (!session || !session.user?.id) {
@@ -23,7 +25,7 @@ export async function POST(req: NextRequest, { params }) {
                 name,
                 amount,
                 eventId: id,
-                addedBy: userId
+                addedBy: userId,
             },
         });
 

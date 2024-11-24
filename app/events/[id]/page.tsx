@@ -11,12 +11,11 @@ import { useSession } from 'next-auth/react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import CreateExpenseForm from '@/components/form/createExpenseForm';
+import { Expense } from '@prisma/client';
 
-type Expense = {
-    id: string;
-    name: string;
-    amount: number;
-};
+interface Expenses extends Expense {
+    user: BasicUserInfo
+}
 
 export default function EventDetails() {
     const { id } = useParams<{ id: string; }>()
@@ -30,10 +29,16 @@ export default function EventDetails() {
 
     const [event, setEvent] = useState(null);
     const [calculationHistory, setCaluclationHistory] = useState([])
-    const [expenses, setExpenses] = useState<any[]>([]);
+    const [expenses, setExpenses] = useState<Expenses[]>([]);
+    const [users, setUsers] = useState<EventUsers[]>([])
 
     const [inviteEmail, setInviteEmail] = useState('')
     const scrollAreaRef = useRef<HTMLDivElement>(null)
+
+    const bottomRef = useRef(null)
+
+
+
 
 
 
@@ -53,13 +58,33 @@ export default function EventDetails() {
     }
 
     const fetchInvitedUsers = async () => {
+        try {
+            const response = await fetch(`/api/events/${id}/users`)
 
+            const data = await response.json();
+
+            setUsers(data)
+
+        } catch (error) {
+
+            console.error('error fetching users', error)
+        }
     }
 
+
+    // Scroll to the bottom when expenses change
+    useEffect(() => {
+
+
+        bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+
+
+    }, [expenses]);
 
     useEffect(() => {
         if (id) {
             fetchExpenseAndCalculation();
+            fetchInvitedUsers()
         }
     }, [id]);
 
@@ -103,15 +128,15 @@ export default function EventDetails() {
     };
 
     // TODO: when i add it refreshes all UI. fix it
-    const handleAddExpense = async (expense: { expenseName: string, expenseAmount: number }) => {
+    const handleAddExpense = async (expense: { expenseName: string, expenseAmount: string }) => {
 
         if (!expense.expenseName || !expense.expenseAmount) return;
-
+        console.log(expense)
         try {
             const response = await fetch(`/api/events/${id}/expenses`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name: expense.expenseName, amount: expense.expenseAmount.toString() }),
+                body: JSON.stringify({ name: expense.expenseName, amount: parseFloat(expense.expenseAmount) }),
             });
 
             if (!response.ok) {
@@ -163,6 +188,7 @@ export default function EventDetails() {
                         <CardContent className='h-[80%] space-y-4'>
 
                             <CreateExpenseForm onSubmit={handleAddExpense} />
+
                             <ScrollArea className="h-full p-4">
                                 {expenses.map((expense, index) => {
                                     // Find any calculation history that matches this expense
@@ -189,9 +215,6 @@ export default function EventDetails() {
                                                                 {balance > 0 ? `gets $${balance.toFixed(2)}` : `owes $${Math.abs(balance).toFixed(2)}`}
                                                             </li>
                                                         ))}
-
-
-
                                                     </ul>
                                                 </div>
                                             )}
@@ -205,7 +228,11 @@ export default function EventDetails() {
                                         <h3 className="text-lg font-semibold">No Expenses Found</h3>
                                     </div>
                                 )}
+
+                                {/* Dummy element for scrolling */}
+                                <div ref={bottomRef}></div>
                             </ScrollArea>
+
 
                         </CardContent>
 

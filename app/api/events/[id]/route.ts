@@ -1,5 +1,5 @@
-import prisma from '@/lib/prisma';
-import { NextRequest, NextResponse } from 'next/server';
+import prisma from "@/lib/prisma";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest, { params }) {
     const { id } = await params;
@@ -10,7 +10,8 @@ export async function GET(req: NextRequest, { params }) {
             include: {
                 expenses: {
                     include: {
-                        user: { // Include the user who added the expense
+                        user: {
+                            // Include the user who added the expense
                             select: {
                                 id: true,
                                 name: true,
@@ -28,12 +29,15 @@ export async function GET(req: NextRequest, { params }) {
         });
 
         if (!event) {
-            return NextResponse.json({ error: 'Event not found' }, { status: 404 });
+            return NextResponse.json({ error: "Event not found" }, { status: 404 });
         }
 
         return NextResponse.json({ event, calculationHistory });
     } catch (error) {
-        console.error('Error fetching event:', error);
-        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+        console.error("Error fetching event:", error);
+        return NextResponse.json(
+            { error: "Internal Server Error" },
+            { status: 500 }
+        );
     }
 }

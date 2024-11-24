@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils'
 export default function CreateExpenseForm({ onSubmit, className = '' }) {
 
     const [expenseName, setExpenseName] = useState('')
-    const [expenseAmount, setExpenseAmount] = useState(0)
+    const [expenseAmount, setExpenseAmount] = useState('')
     // TODO: Make so i can add image 
 
     const handleSubmit = (e: FormEvent) => {
@@ -22,7 +22,7 @@ export default function CreateExpenseForm({ onSubmit, className = '' }) {
 
 
         onSubmit(newExpense)
-        setExpenseAmount(0)
+        setExpenseAmount('')
         setExpenseName('')
 
     }
@@ -40,7 +40,7 @@ export default function CreateExpenseForm({ onSubmit, className = '' }) {
                 type="number"
                 placeholder="Amount"
                 value={expenseAmount}
-                onChange={(e) => setExpenseAmount(parseInt(e.target.value))}
+                onChange={(e) => setExpenseAmount((e.target.value).toString())}
                 className="w-24"
             />
             <Button type="submit">Add Expense</Button>
