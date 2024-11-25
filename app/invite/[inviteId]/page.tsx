@@ -7,10 +7,26 @@ import { useSession } from 'next-auth/react';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
+interface Invite {
+    id: string;
+    eventId: string;
+    email: string;
+    expiresAt: Date;
+    event: InvitedEvent
+}
+
+interface InvitedEvent {
+    id: string;
+    name: string;
+    createdAt: Date;
+    creatorId: string;
+    updatedAt: Date;
+}
+
 const InvitePage = () => {
     const { inviteId } = useParams<{ inviteId: string }>()
     const router = useRouter();
-    const [invite, setInvite] = useState(null);
+    const [invite, setInvite] = useState<Invite>();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [accepting, setAccepting] = useState(false);
@@ -101,7 +117,8 @@ const InvitePage = () => {
                 <CardContent className="space-y-4">
                     <div className="text-center">
                         <h2 className="text-xl font-semibold mb-2">{invite?.event?.name}</h2>
-                        <p className="text-sm text-gray-500">You're invited by {invite?.inviter?.name || 'Someone special'}</p>
+                        {/* TODO: Add inviter name. Need to update database model */}
+                        {/* <p className="text-sm text-gray-500">You're invited by {invite?.inviter?.name || 'Someone special'}</p> */}
                     </div>
                 </CardContent>
                 <CardFooter className="flex justify-between">

@@ -5,7 +5,17 @@ import { Input } from '../ui/input'
 import { Button } from '../ui/button'
 import { cn } from '@/lib/utils'
 
-export default function CreateExpenseForm({ onSubmit, className = '' }) {
+interface NewExpense {
+    expenseName: string,
+    expenseAmount: string
+}
+
+interface Props {
+    onSubmit: (newExpense: NewExpense) => void; // Function to handle form submission
+    className?: string; // Optional string for CSS class names
+}
+
+export default function CreateExpenseForm({ onSubmit, className = '' }: Props) {
 
     const [expenseName, setExpenseName] = useState('')
     const [expenseAmount, setExpenseAmount] = useState('')

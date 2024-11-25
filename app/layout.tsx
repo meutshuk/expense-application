@@ -7,6 +7,7 @@ import AuthLayout from "@/components/layouts/authLayout";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { Navbar } from "@/components/navbar";
+import { Suspense } from "react";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -38,9 +39,13 @@ export default function RootLayout({
         <AuthLayout>
           <Navbar />
           <SidebarProvider>
+            <Suspense>
+
+              {children}
+            </Suspense>
 
             {/* <AppSidebar /> */}
-            {children}
+
           </SidebarProvider>
         </AuthLayout>
 

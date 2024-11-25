@@ -6,18 +6,27 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation"
 
 export default function Login() {
 
     const searchParams = useSearchParams();
-    const callbackUrl = searchParams.get('callbackUrl') || '/'
+    // const callbackUrl = searchParams.get('callbackUrl') || '/'
+
+
     const inviteId = searchParams.get('inviteId') || '';
 
-
+    const [callbackUrl, setCallbackUrl] = useState('')
     const [isLoading, setIsLoading] = useState<boolean>(false)
     const [message, setMessage] = useState<string>('')
+
+
+    useEffect(() => {
+        // Do something here...
+        setCallbackUrl(searchParams.get('callbackUrl') || '/'
+        )
+    }, [searchParams])
 
 
     const handleLogin = async (e: any) => {

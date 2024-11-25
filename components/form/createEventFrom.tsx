@@ -7,7 +7,16 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { cn } from "@/lib/utils"
 
-export function CreateEventForm({ onSubmit, className = "" }) {
+interface NewEvent {
+    name: string,
+    description: string
+}
+
+interface Props {
+    onSubmit: (newEvent: NewEvent) => void; // Function to handle form submission
+    className?: string; // Optional string for CSS class names
+}
+export function CreateEventForm({ onSubmit, className = "" }: Props) {
     const [name, setName] = useState('')
     const [description, setDescription] = useState('')
 
