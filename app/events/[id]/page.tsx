@@ -20,29 +20,52 @@ import { Button } from "@/components/ui/button";
 import CreateExpenseForm from "@/components/form/createExpenseForm";
 import { Expense } from "@prisma/client";
 import { Badge } from "@/components/ui/badge";
-
+import { useMediaQuery } from "@/lib/useMediaQuery";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Check } from "lucide-react";
 interface Expenses extends Expense {
     user: BasicUserInfo;
+}
+
+interface CalculationHistory {
+    id: string;
+    eventId: string;
+    date: Date;
+    expenseId: string;
+    history: History; // Replace `any[]` with the correct type if known
+}
+
+interface History {
+    balances: Balances[]
+}
+
+interface Balances {
+    balance: number;
+    user: BasicUserInfo
 }
 
 export default function EventDetails() {
     const { id } = useParams<{ id: string }>();
 
+    const isDesktop = useMediaQuery("(min-width: 768px)")
+
     const { data: session } = useSession();
 
-    const [balances, setBalances] = useState(null);
+
+    const [balances, setBalances] = useState<Balances[]>([]);
     const [error, setError] = useState("");
     const [calculating, setCalculating] = useState(false);
 
     const [event, setEvent] = useState(null);
-    const [calculationHistory, setCaluclationHistory] = useState([]);
+    const [calculationHistory, setCaluclationHistory] = useState<CalculationHistory[]>([]);
     const [expenses, setExpenses] = useState<Expenses[]>([]);
     const [users, setUsers] = useState<EventUsers[]>([]);
 
     const [inviteEmail, setInviteEmail] = useState("");
     const scrollAreaRef = useRef<HTMLDivElement>(null);
 
-    const bottomRef = useRef(null);
+    const bottomRef = useRef<HTMLDivElement>(null);
+
 
     const fetchExpenseAndCalculation = async () => {
         try {
@@ -115,7 +138,7 @@ export default function EventDetails() {
             // Refresh expenses and calculation history after successful calculation
             await fetchExpenseAndCalculation();
         } catch (err) {
-            setError(err.message);
+            setError((err as Error).message);
         } finally {
             setCalculating(false);
         }
@@ -151,6 +174,42 @@ export default function EventDetails() {
         }
     };
 
+    const UserList = () => (
+        <>
+            <CardHeader>
+                <CardTitle>Users</CardTitle>
+                <CardDescription>List of Users who has access.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <ul>
+                    {users.map((user) => (
+                        <li
+                            key={user.id}
+                            className="flex items-center space-x-4 p-2 rounded-lg hover:bg-accent"
+                        >
+                            <div className="flex-grow">
+                                <div className="flex items-center justify-between">
+                                    <span className="font-medium">{user.email}</span>
+                                    {user.role === "creator" && (
+                                        <Badge
+                                            variant="secondary"
+                                            className="rounded-full text-xs"
+                                        >
+                                            Creator
+                                        </Badge>
+                                    )}
+                                </div>
+                                <div className="text-sm text-muted-foreground">
+                                    {user.name}
+                                </div>
+                            </div>
+                        </li>
+                    ))}
+                </ul>
+            </CardContent>
+        </>
+    )
+
     const ExpenseBubble = ({
         expense,
         isCurrentUser,
@@ -165,11 +224,11 @@ export default function EventDetails() {
                 className={`flex items-start ${isCurrentUser ? "flex-row-reverse" : ""
                     }`}
             >
-                <Avatar className="h-8 w-8 mx-2"></Avatar>
+                {/* <Avatar className="h-8 w-8 mx-2"></Avatar> */}
                 <Card
                     className={`max-w-[70%]  ${isCurrentUser
-                            ? "bg-primary text-primary-foreground"
-                            : "bg-secondary"
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-secondary"
                         }`}
                 >
                     <CardContent className="p-3">
@@ -179,27 +238,68 @@ export default function EventDetails() {
                             {new Date(expense.createdAt).toLocaleString()}
                         </p>
                     </CardContent>
+
                 </Card>
             </div>
         </div>
     );
 
     return (
-        <div className="container mx-auto p-4  ">
-            <div className="h-[80vh] flex gap-4">
-                <div className="h-full flex-1">
-                    <Card className="h-full ">
+        <div className="container mx-auto p-4">
+            <div className="flex flex-col md:flex-row gap-4">
+                <div className="w-full md:w-2/3">
+                    <Card className="h-[80vh]">
                         <CardHeader>
                             <CardTitle>
-                                <div>{event}</div>
+                                <div className="flex justify-between">
+                                    <div>{event}</div>
+                                    {
+                                        isDesktop ?
+                                            (null) : (<Sheet>
+                                                <SheetTrigger asChild>
+                                                    <Button className="w-fit md:w-auto" variant={"secondary"}>Manage Users</Button>
+                                                </SheetTrigger>
+                                                <SheetContent>
+                                                    <SheetHeader>
+                                                        <SheetTitle>Manage Users</SheetTitle>
+                                                    </SheetHeader>
+                                                    <div className="mt-4">
+                                                        <Card>
+                                                            <CardHeader>
+                                                                <CardTitle>Invite Users</CardTitle>
+                                                                <CardDescription>Invite User to Add expenses.</CardDescription>
+                                                            </CardHeader>
+                                                            <CardContent>
+                                                                <div className="flex flex-col space-y-4">
+                                                                    <Input
+                                                                        type="email"
+                                                                        placeholder="User Email"
+                                                                        value={inviteEmail}
+                                                                        onChange={(e) => setInviteEmail(e.target.value)}
+                                                                    />
+                                                                    <Button className="w-full" onClick={handleInvite}>
+                                                                        Send Invite
+                                                                    </Button>
+                                                                </div>
+                                                            </CardContent>
+                                                        </Card>
+
+                                                        <Card className="mt-4">
+                                                            <UserList />
+                                                        </Card>
+                                                    </div>
+                                                </SheetContent>
+                                            </Sheet>)
+                                    }
+                                </div>
+
                             </CardTitle>
                         </CardHeader>
-                        <CardContent className="h-[80%] space-y-4">
+                        <CardContent className="h-[calc(100%-8rem)] space-y-4">
                             <CreateExpenseForm onSubmit={handleAddExpense} />
 
                             <ScrollArea className="h-full p-4">
                                 {expenses.map((expense, index) => {
-                                    // Find any calculation history that matches this expense
                                     const matchingCalculation = calculationHistory.find(
                                         (calculation) => calculation.expenseId === expense.id
                                     );
@@ -210,20 +310,16 @@ export default function EventDetails() {
                                                 expense={expense}
                                                 isCurrentUser={expense.user.id === session?.user.id}
                                             />
-                                            {/* If there is a matching calculation, render the history */}
                                             {matchingCalculation && (
                                                 <div className="border-t border-gray-300 my-4">
-                                                    <h3 className="text-lg font-semibold">
+                                                    <h3 className="text-sm font-semibold text-muted-foreground">
                                                         Calculation (Date:{" "}
-                                                        {new Date(
-                                                            matchingCalculation.date
-                                                        ).toLocaleDateString()}
-                                                        )
+                                                        {new Date(matchingCalculation.date).toLocaleDateString()})
                                                     </h3>
                                                     <ul>
                                                         {matchingCalculation.history.balances.map(
                                                             ({ user, balance }) => (
-                                                                <li key={user.id}>
+                                                                <li className="text-xs text-black" key={user.id}>
                                                                     User {user.name}:{" "}
                                                                     {balance > 0
                                                                         ? `gets $${balance.toFixed(2)}`
@@ -238,36 +334,33 @@ export default function EventDetails() {
                                     );
                                 })}
 
-                                {/* Render any uncalculated expenses (after all the calculated ones) */}
                                 {expenses.length === 0 && (
                                     <div>
                                         <h3 className="text-lg font-semibold">No Expenses Found</h3>
                                     </div>
                                 )}
 
-                                {/* Dummy element for scrolling */}
                                 <div ref={bottomRef}></div>
                             </ScrollArea>
                         </CardContent>
                     </Card>
 
-                    <div className="flex gap-10 mt-6 items-center">
+                    <div className="flex flex-col md:flex-row gap-4 mt-6 items-center">
                         <Button
                             onClick={handleCalculate}
                             disabled={calculating}
-                            className=""
+                            className="w-full md:w-auto"
                         >
                             {calculating ? "Calculating..." : "Calculate Balances"}
                         </Button>
 
-                        <Card className="bg-gray-100 h-36 w-full">
-                            <CardTitle />
-                            <CardContent>
+                        <Card className="bg-gray-100 w-full md:flex-1">
+                            <CardContent className="p-4">
                                 {balances && (
                                     <ul className="list-none p-0">
                                         {balances.map(({ user, balance }) => (
                                             <li
-                                                className={`p-2 rounded ${balance > 0 ? "text-green-400" : "text-red-400"
+                                                className={`p-2 rounded ${balance > 0 ? "text-green-600" : "text-red-600"
                                                     }`}
                                                 key={user.id}
                                             >
@@ -283,64 +376,37 @@ export default function EventDetails() {
                         </Card>
                     </div>
                 </div>
-                <fieldset className=" flex flex-col w-1/3 h-fit gap-6 rounded-lg border p-4">
-                    <legend>Users</legend>
 
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Invite Users</CardTitle>
-                            <CardDescription>Invite User to Add expenses.</CardDescription>
-                        </CardHeader>
-                        <CardContent></CardContent>
+                {isDesktop ? (
+                    <div className="w-full md:w-1/3">
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Invite Users</CardTitle>
+                                <CardDescription>Invite User to Add expenses.</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="flex flex-col space-y-4">
+                                    <Input
+                                        type="email"
+                                        placeholder="User Email"
+                                        value={inviteEmail}
+                                        onChange={(e) => setInviteEmail(e.target.value)}
+                                    />
+                                    <Button className="w-full" onClick={handleInvite}>
+                                        Send Invite
+                                    </Button>
+                                </div>
+                            </CardContent>
+                        </Card>
 
-                        <CardFooter className="flex flex-col space-y-4">
-                            <Input
-                                type="email"
-                                placeholder="User Email"
-                                value={inviteEmail}
-                                onChange={(e) => setInviteEmail(e.target.value)}
-                            />
-                            <Button className="w-full" onClick={handleInvite}>
-                                Send Invite
-                            </Button>
-                        </CardFooter>
-                    </Card>
-
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Users</CardTitle>
-                            <CardDescription>List of Users who has access.</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <ul>
-                                {users.map((user) => (
-                                    <li
-                                        key={user.id}
-                                        className="flex items-center space-x-4 p-2 rounded-lg hover:bg-accent"
-                                    >
-                                        <div className="flex-grow">
-                                            <div className="flex items-center justify-between">
-                                                <span className="font-medium">{user.email}</span>
-                                                {user.role === "creator" && (
-                                                    <Badge
-                                                        variant="secondary"
-                                                        className="rounded-full text-xs"
-                                                    >
-                                                        Creator
-                                                    </Badge>
-                                                )}
-                                            </div>
-                                            <div className="text-sm text-muted-foreground">
-                                                {user.name}
-                                            </div>
-                                        </div>
-                                    </li>
-                                ))}
-                            </ul>
-                        </CardContent>
-                    </Card>
-                </fieldset>
+                        <Card className="mt-4">
+                            <UserList />
+                        </Card>
+                    </div>
+                ) : (
+                    null
+                )}
             </div>
         </div>
-    );
+    )
 }

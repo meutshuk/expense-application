@@ -4,8 +4,9 @@ import { getServerSession } from 'next-auth';
 // import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { redirect } from 'next/navigation';
 
-export default async function AcceptInvitePage({ params }: { params: { id: string } }) {
-    const { id: inviteId } = params;
+export default async function AcceptInvitePage({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params;
+    const inviteId = id
 
     // Fetch the invitation details
     const invite = await prisma.invitedUser.findUnique({

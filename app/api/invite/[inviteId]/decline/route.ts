@@ -1,11 +1,14 @@
 import { authOptions } from '@/lib/authOptions';
 import prisma from '@/lib/prisma';
 import { getServerSession } from 'next-auth';
-// import { authOptions } from '@/app/api/auth/[...nextauth]/route'; // Adjust the path if needed
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
-    const { id: inviteId } = params;
+
+type Param = Promise<{ inviteId: string }>
+export async function POST(req: NextRequest, { params }: { params: Param }) {
+
+    const { inviteId } = await params;
+    const id = inviteId
 
     try {
         // Get session details to ensure the user is authenticated

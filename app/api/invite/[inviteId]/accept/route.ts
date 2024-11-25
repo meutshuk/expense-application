@@ -4,7 +4,8 @@ import { getServerSession } from 'next-auth';
 // import { authOptions } from '@/app/api/auth/[...nextauth]/route'; // Adjust the path if needed
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function POST(req: NextRequest, { params }: { params: { inviteId: string } }) {
+type Param = Promise<{ inviteId: string }>
+export async function POST(req: NextRequest, { params }: { params: Param }) {
     const { inviteId: inviteId } = await params;
 
 

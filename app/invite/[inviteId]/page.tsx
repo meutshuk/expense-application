@@ -40,8 +40,7 @@ const InvitePage = () => {
                     router.push(`/login?callbackUrl=/invite/${inviteId}`);
                 }
             } catch (err) {
-                console.error(err.message);
-                setError(err.message || 'An error occurred while processing the invite.');
+                setError((err as Error).message || 'An error occurred while processing the invite.');
                 setLoading(false);
             }
         };
@@ -65,7 +64,6 @@ const InvitePage = () => {
             }
             router.push('/'); // Redirect after accepting
         } catch (err) {
-            console.error(err.message);
             setError('Could not accept invite.');
         } finally {
             setAccepting(false);
@@ -83,7 +81,7 @@ const InvitePage = () => {
             }
             router.push('/dashboard'); // Redirect after declining
         } catch (err) {
-            console.error(err.message);
+            console.error((err as Error).message);
             setError('Could not decline invite.');
         } finally {
             setAccepting(false);

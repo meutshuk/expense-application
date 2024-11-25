@@ -1,12 +1,13 @@
 import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(req: NextRequest, { params }) {
+type Param = Promise<{ id: string }>
+export async function GET(req: NextRequest, { params }: { params: Param }) {
     const { id } = await params;
 
     try {
         const event = await prisma.event.findUnique({
-            where: { id: id }, // Replace eventId with your dynamic value
+            where: { id: id }, // Replace id with your dynamic value
             include: {
                 expenses: {
                     include: {
@@ -18,6 +19,9 @@ export async function GET(req: NextRequest, { params }) {
                                 email: true, // Include other fields as needed
                             },
                         },
+                    },
+                    orderBy: {
+                        createdAt: 'asc', // Sort by createdAt in ascending order
                     },
                 },
             },
