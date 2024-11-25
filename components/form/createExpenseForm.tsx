@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils'
 interface NewExpense {
     expenseName: string,
     expenseAmount: string
+
 }
 
 interface Props {
