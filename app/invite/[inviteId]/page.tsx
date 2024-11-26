@@ -53,7 +53,7 @@ const InvitePage = () => {
                     setLoading(false); // Stop loading, user is logged in and matches invite
                 } else if (status === 'unauthenticated') {
                     // Redirect to login or register if not authenticated
-                    router.push(`/login?callbackUrl=/invite/${inviteId}`);
+                    router.push(`/login?callbackUrl=/invite/${inviteId}&email=${invite?.email}`);
                 }
             } catch (err) {
                 setError((err as Error).message || 'An error occurred while processing the invite.');
