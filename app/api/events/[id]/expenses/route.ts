@@ -1,3 +1,4 @@
+import { sendNotification } from '@/app/actions';
 import { authOptions } from '@/lib/authOptions';
 import prisma from '@/lib/prisma';
 import { getServerSession } from 'next-auth';
@@ -30,7 +31,20 @@ export async function POST(req: NextRequest, { params }: { params: Param }) {
             },
         });
 
+        // Fetch users related to the event
+        const eventUsers = await prisma.userEvent.findMany({
+            where: { id },
+            include: { user: true }, // Include user details
+        });
 
+
+        // Notify all users except the one who created the expense
+        const usersToNotify = eventUsers.filter((userEvent) => userEvent.userId !== userId);
+
+
+        for (const { user } of usersToNotify) {
+            await sendNotification(user.id, `New expense added: ${name} ($${amount})`);
+        }
 
         // Fetch the created expense with user details
         const detailedExpense = await prisma.expense.findUnique({

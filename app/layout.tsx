@@ -1,5 +1,3 @@
-
-
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
@@ -10,6 +8,7 @@ import { Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
+import LoginRegister from "@/components/login-register";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -32,35 +31,27 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
-  const session = await getServerSession(authOptions)
-  if (!session) return
+  const session = await getServerSession(authOptions);
 
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-
-        <AuthLayout>
-          <Navbar userId={session.user.id} />
-          <SidebarProvider>
-            <Suspense>
-              <Toaster />
-
-              {children}
-            </Suspense>
-
-            {/* <AppSidebar /> */}
-
-          </SidebarProvider>
-        </AuthLayout>
-
-
-
-
+        {session ? (
+          <AuthLayout>
+            <Navbar userId={session.user.id} />
+            <SidebarProvider>
+              <Suspense>
+                <Toaster />
+                {children}
+              </Suspense>
+            </SidebarProvider>
+          </AuthLayout>
+        ) : (
+          <LoginRegister />
+        )}
       </body>
-
     </html>
   );
 }
