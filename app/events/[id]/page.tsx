@@ -6,6 +6,7 @@ import {
     Card,
     CardContent,
     CardDescription,
+    CardFooter,
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
@@ -35,6 +36,8 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog";
 import AddExpenseForm from "@/components/add-expense-form";
+import { CalendarDays, DollarSign, User } from "lucide-react";
+import Image from 'next/image'
 
 interface InvitedUsers {
     id: string;
@@ -156,12 +159,12 @@ export default async function Page({ params }: Props) {
     if (!event) return;
 
     return (
-        <div className="container mx-auto px-4">
-            <div>
-                <div>{event.name}</div>
+        <div className="container mx-auto my-10">
+            <div className="flex justify-between items-center">
+                <div className="text-3xl uppercase font-bold" >{event.name}</div>
                 <Sheet>
                     <SheetTrigger asChild>
-                        <Button>Manage Users</Button>
+                        <Button><User /> Manage Users</Button>
                     </SheetTrigger>
                     <SheetContent>
                         <SheetHeader>
@@ -205,11 +208,78 @@ export default async function Page({ params }: Props) {
 
                         return (
                             <div key={expense.id}>
-                                <ExpenseBubble
-                                    expense={expense}
-                                    isCurrentUser={expense.user.id === session?.user.id}
-                                />
 
+                                {/* <Dialog>
+                                    <DialogTrigger asChild>
+
+                                        <ExpenseBubble
+                                            expense={expense}
+                                            isCurrentUser={expense.user.id === session?.user.id}
+                                        />
+
+
+                                    </DialogTrigger>
+
+                                    <DialogContent>
+                                        <DialogHeader>
+                                            <DialogTitle>Expense: {expense.name}</DialogTitle>
+                                            <DialogDescription>
+                                                {expense.description}
+                                            </DialogDescription>
+                                        </DialogHeader>
+                                        <div>
+                                            Amount: <span>{expense.amount}</span>
+                                        </div>
+
+                                    </DialogContent>
+                                </Dialog> */}
+
+                                <Dialog>
+                                    <DialogTrigger asChild>
+                                        <ExpenseBubble
+                                            expense={expense}
+                                            isCurrentUser={expense.user.id === session?.user.id}
+                                        />
+
+                                    </DialogTrigger>
+                                    <DialogContent className="sm:max-w-[425px]">
+                                        <DialogHeader>
+                                            <DialogTitle>Expense Details</DialogTitle>
+                                            <DialogDescription>View the details of this expense.</DialogDescription>
+                                        </DialogHeader>
+                                        <Card className="border-0 shadow-none">
+                                            <CardHeader className="  flex justify-between flex-row items-center">
+                                                <CardTitle>{expense.name}</CardTitle>
+                                                <Badge variant="secondary" className="w-fit border border-black items-center justify-center">
+                                                    <DollarSign className="mr-1 h-3 w-3" />
+                                                    {expense.amount.toFixed(2)}
+                                                </Badge>
+                                            </CardHeader>
+                                            <CardContent className="">
+                                                {
+                                                    expense.imageUrl ?
+                                                        <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg">
+                                                            <Image
+                                                                src={expense.imageUrl}
+                                                                alt={`Receipt for ${expense.name}`}
+                                                                fill
+                                                                className="object-cover"
+                                                            />
+                                                        </div> : ''
+                                                }
+
+                                                <p className="text-sm text-muted-foreground">{expense.description}</p>
+                                            </CardContent>
+                                            <Separator className="my-2" />
+                                            <CardFooter>
+                                                <div className="flex items-center text-sm text-muted-foreground">
+                                                    <CalendarDays className="mr-1 h-4 w-4" />
+                                                    {new Date(expense.createdAt).toLocaleString()}
+                                                </div>
+                                            </CardFooter>
+                                        </Card>
+                                    </DialogContent>
+                                </Dialog>
                                 {matchingCalculation && (
                                     <div className="border-t border-gray-300 my-4">
                                         <div className="text-sm font-semibold text-muted-foreground">
