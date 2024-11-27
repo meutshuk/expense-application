@@ -50,6 +50,7 @@ webpush.setVapidDetails(
 );
 
 export async function sendNotification(userId: string, message: string) {
+    console.log("send notification")
     try {
         // Fetch all subscriptions for the user
         const subscriptions = await prisma.pushSubscription.findMany({

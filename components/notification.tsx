@@ -46,13 +46,14 @@ export default function NotificationBell({ userId }: { userId: string }) {
         try {
             // Register service worker
             const registration = await navigator.serviceWorker.register('/sw.js');
-
+            console.log(registration)
+            const publicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!;
             // Subscribe to push notifications
             const subscription = await registration.pushManager.subscribe({
                 userVisibleOnly: true,
-                applicationServerKey: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
+                applicationServerKey: publicKey,
             });
-
+            console.log(subscription)
             const serializedSubscription = {
                 endpoint: subscription.endpoint,
                 expirationTime: subscription.expirationTime || null,
