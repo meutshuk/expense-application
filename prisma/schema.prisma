@@ -59,15 +59,16 @@ model InvitedUser {
 }
 
 model Expense {
-  id        String   @id @default(cuid())
-  name      String
-  amount    Float
-  eventId   String
-  addedBy   String
-  user      User     @relation(fields: [addedBy], references: [id])
-  createdAt DateTime @default(now())
-  event     Event    @relation(fields: [eventId], references: [id])
-
+  id                 String                    @id @default(cuid())
+  name               String
+  description        String?
+  amount             Float
+  eventId            String
+  addedBy            String
+  user               User                      @relation(fields: [addedBy], references: [id])
+  createdAt          DateTime                  @default(now())
+  event              Event                     @relation(fields: [eventId], references: [id])
+  imageUrl           String?
   calculated         Boolean                   @default(false)
   calculationHistory EventCalculationHistory[]
 }

@@ -44,9 +44,9 @@ export async function POST(req: NextRequest, { params }: { params: Param }) {
 
         // Send the email
         await transporter.sendMail({
-            from: `"EventHub" <${process.env.EMAIL_USER}>`, // Sender's email
+            from: `"Expense Tracker" <${process.env.EMAIL_USER}>`, // Sender's email
             to: email, // Recipient's email
-            subject: 'You have been invited to join an event on EventHub!',
+            subject: 'You have been invited to join an event on Expense Hub!',
             html: `
                 <h1>You've been invited!</h1>
                 <p>Click the link below to accept the invitation:</p>

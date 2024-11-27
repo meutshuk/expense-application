@@ -11,10 +11,11 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Menu, X, User, LogOut } from 'lucide-react'
+import { Menu, X, LogOut, Heading, Heading1Icon } from 'lucide-react'
 import { cn } from "@/lib/utils"
 import { signOut } from 'next-auth/react';
 import NotificationBell from './notification'
+import { User } from 'next-auth'
 
 interface Navigation {
     name: string,
@@ -25,9 +26,10 @@ const navigation: Navigation[] = []
 
 interface Props {
     userId: string
+    user: User
 }
 
-export function Navbar({ userId }: Props) {
+export function Navbar({ userId, user }: Props) {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
     const pathname = usePathname()
 
@@ -46,7 +48,7 @@ export function Navbar({ userId }: Props) {
                             <svg className="h-8 w-auto text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                             </svg>
-                            <span className="ml-2 text-xl font-bold text-gray-900">EventHub</span>
+                            <span className="ml-2 text-xl font-bold text-gray-900">Expense Tracker</span>
                         </Link>
                         <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
                             {navigation.map((item) => (
@@ -70,14 +72,14 @@ export function Navbar({ userId }: Props) {
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                                    <User className="h-6 w-6" />
+                                    <Heading className="h-6 w-6" />
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
                                 <DropdownMenuItem disabled>
                                     <div className="">
-                                        <div className=" text-gray-800">Tom Cook</div>
-                                        <div className="text-sm font-medium text-gray-500">tom@example.com</div>
+                                        <div className=" text-gray-800">{user.name}</div>
+                                        <div className="text-sm font-medium text-gray-500">{user.email}</div>
                                     </div>
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
@@ -94,6 +96,7 @@ export function Navbar({ userId }: Props) {
                         </DropdownMenu>
                     </div>
                     <div className="-mr-2 flex items-center sm:hidden">
+                        <NotificationBell userId={userId} />
                         <Button
                             variant="ghost"
                             className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
@@ -131,11 +134,12 @@ export function Navbar({ userId }: Props) {
                     <div className="border-t border-gray-200 pb-3 pt-4">
                         <div className="flex items-center px-4">
                             <div className="flex-shrink-0">
-                                <User className="h-8 w-8 rounded-full" />
+
+                                <Heading1Icon className="h-8 w-8 rounded-full" />
                             </div>
                             <div className="ml-3">
-                                <div className="text-base font-medium text-gray-800">Tom Cook</div>
-                                <div className="text-sm font-medium text-gray-500">tom@example.com</div>
+                                <div className="text-base font-medium text-gray-800">{user.name}</div>
+                                <div className="text-sm font-medium text-gray-500">{user.email}</div>
                             </div>
                         </div>
                         <div className="mt-3 space-y-1">

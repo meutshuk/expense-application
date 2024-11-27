@@ -36,7 +36,6 @@ export default function HomePage() {
       try {
         const response = await fetch(`/api/events?userId=${session.user.id}`);
         const data = await response.json();
-
         setEvents(data); // Ensure `data` is an array
       } catch (error) {
         console.error('Error fetching events:', error);
@@ -124,25 +123,26 @@ export default function HomePage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {events.map(({ event, role }) => (
             <div className="w-full" key={event.id}> {/* Set width to full */}
-              <Card className="overflow-hidden transition-shadow duration-300 hover:shadow-lg">
-                <CardHeader className="p-0">
-                  {/* Add content here */}
-                </CardHeader>
-                <CardContent className="p-6">
-                  <CardTitle className="mb-2 text-xl font-semibold">
-                    <Link href={`/events/${event.id}`} className="text-blue-600 hover:text-blue-800 transition-colors duration-200">
+              <Link href={`/events/${event.id}`} >
+                <Card className="overflow-hidden transition-shadow duration-300 hover:shadow-lg">
+                  <CardHeader className="p-0">
+                    {/* Add content here */}
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <CardTitle className="mb-2 text-xl font-semibold">
+
                       {event.name}
-                    </Link>
-                  </CardTitle>
-                  <p className="text-sm text-gray-600">Created: {new Date(event.createdAt).toLocaleDateString()}</p>
-                  <p className="text-sm text-gray-600 capitalize mt-1">Role: {role}</p>
-                </CardContent>
-                <CardFooter className="bg-gray-50 p-4 flex justify-end">
-                  <Button asChild variant="outline">
-                    <Link href={`/events/${event.id}`}>View Details</Link>
-                  </Button>
-                </CardFooter>
-              </Card>
+
+                    </CardTitle>
+                    <p className="text-sm text-gray-600">Created: {new Date(event.createdAt).toLocaleDateString()}</p>
+                    <p className="text-sm text-gray-600 capitalize mt-1">Role: {role}</p>
+                  </CardContent>
+                  <CardFooter className="bg-gray-50 p-4 flex justify-end">
+
+                  </CardFooter>
+                </Card>
+              </Link>
+
             </div>
           ))}
         </div>

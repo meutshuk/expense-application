@@ -2,8 +2,8 @@ import type { MetadataRoute } from 'next';
 
 export default function manifest(): MetadataRoute.Manifest {
     return {
-        name: 'EventHub',
-        short_name: 'EventHub',
+        name: 'Expense Tracket',
+        short_name: 'ExpenseHub',
         description: 'Create events and track expenses.',
         start_url: '/',
         display: 'standalone',

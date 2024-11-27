@@ -40,7 +40,7 @@ export default async function RootLayout({
       >
         {session ? (
           <AuthLayout>
-            <Navbar userId={session.user.id} />
+            <Navbar userId={session.user.id} user={session.user} />
             <SidebarProvider>
               <Suspense>
                 <Toaster />

@@ -19,7 +19,7 @@ export async function POST(req: NextRequest, { params }: { params: Param }) {
         });
 
         if (expenses.length === 0) {
-            return NextResponse.json({ message: 'No uncalculated expenses found' });
+            return NextResponse.json({ success: false, message: 'No uncalculated expenses found' });
         }
 
         // Calculate balances
@@ -62,6 +62,7 @@ export async function POST(req: NextRequest, { params }: { params: Param }) {
         });
 
         return NextResponse.json({
+            success: true,
             message: 'Calculation completed',
             balances: userDetailsBalances,
         });
