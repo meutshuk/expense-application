@@ -44,6 +44,7 @@ const InvitePage = () => {
                 setInvite(inviteData);
 
 
+
                 if (status === 'authenticated' && session?.user) {
                     // Check if the logged-in user's email matches the invited email
                     if (session.user.email !== inviteData.email) {
@@ -53,7 +54,7 @@ const InvitePage = () => {
                     setLoading(false); // Stop loading, user is logged in and matches invite
                 } else if (status === 'unauthenticated') {
                     // Redirect to login or register if not authenticated
-                    router.push(`/login?callbackUrl=/invite/${inviteId}&email=${invite?.email}`);
+                    router.push(`/login?callbackUrl=/invite/${inviteId}&email=${inviteData?.email}`);
                 }
             } catch (err) {
                 setError((err as Error).message || 'An error occurred while processing the invite.');
@@ -104,12 +105,12 @@ const InvitePage = () => {
         }
     };
 
-    if (loading) return <p>Loading...</p>;
-    if (error) return <p>{error}</p>;
+    // if (loading) return <p>Loading...</p>;
+    // if (error) return <p>{error}</p>;
 
     return (
 
-        <div className="min-h-screen flex items-center justify-center   p-4">
+        <div className="min-h-screen w-full flex items-center justify-center   p-4">
             <Card className="w-full max-w-md">
                 <CardHeader className="text-center">
                     <CardTitle className="text-2xl font-bold">You've been invited!</CardTitle>

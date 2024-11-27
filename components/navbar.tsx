@@ -14,6 +14,7 @@ import {
 import { Menu, X, User, LogOut } from 'lucide-react'
 import { cn } from "@/lib/utils"
 import { signOut } from 'next-auth/react';
+import NotificationBell from './notification'
 
 interface Navigation {
     name: string,
@@ -22,7 +23,11 @@ interface Navigation {
 
 const navigation: Navigation[] = []
 
-export function Navbar() {
+interface Props {
+    userId: string
+}
+
+export function Navbar({ userId }: Props) {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
     const pathname = usePathname()
 
@@ -61,14 +66,24 @@ export function Navbar() {
                         </div>
                     </div>
                     <div className="hidden sm:ml-6 sm:flex sm:items-center">
+                        <NotificationBell userId={userId} />
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                                    <User className="h-5 w-5" />
+                                    <User className="h-6 w-6" />
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                                <DropdownMenuItem>Profile</DropdownMenuItem>
+                                <DropdownMenuItem disabled>
+                                    <div className="">
+                                        <div className=" text-gray-800">Tom Cook</div>
+                                        <div className="text-sm font-medium text-gray-500">tom@example.com</div>
+                                    </div>
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <Link href={`/profile`}> <DropdownMenuItem >Profile</DropdownMenuItem>
+                                </Link>
+
                                 <DropdownMenuItem>Settings</DropdownMenuItem>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem onClick={handleLogout}>
