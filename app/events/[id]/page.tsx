@@ -250,6 +250,9 @@ export default async function Page({ params }: Props) {
                                         <Card className="border-0 shadow-none">
                                             <CardHeader className="  flex justify-between flex-row items-center">
                                                 <CardTitle>{expense.name}</CardTitle>
+                                                <CardDescription>
+                                                    {expense.description}
+                                                </CardDescription>
                                                 <Badge variant="secondary" className="w-fit border border-black items-center justify-center">
                                                     <DollarSign className="mr-1 h-3 w-3" />
                                                     {expense.amount.toFixed(2)}
@@ -267,8 +270,6 @@ export default async function Page({ params }: Props) {
                                                             />
                                                         </div> : ''
                                                 }
-
-                                                <p className="text-sm text-muted-foreground">{expense.description}</p>
                                             </CardContent>
                                             <Separator className="my-2" />
                                             <CardFooter>
