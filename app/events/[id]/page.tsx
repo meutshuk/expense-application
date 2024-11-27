@@ -23,6 +23,7 @@ import { Badge } from "@/components/ui/badge";
 import { useMediaQuery } from "@/lib/useMediaQuery";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Check } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 interface Expenses extends Expense {
     user: BasicUserInfo;
 }
@@ -50,6 +51,7 @@ export default function EventDetails() {
     const isDesktop = useMediaQuery("(min-width: 768px)")
 
     const { data: session } = useSession();
+    const { toast } = useToast()
 
 
     const [balances, setBalances] = useState<Balances[]>([]);
@@ -116,7 +118,15 @@ export default function EventDetails() {
                 body: JSON.stringify({ email: inviteEmail }),
             });
 
-            const data = await response.json();
+            if (response.ok) {
+                toast({
+                    title: 'Invitation Link Sent'
+
+                })
+
+                setInviteEmail('')
+            }
+
         } catch (error) {
             console.error("Error inviting user:", error);
         }
@@ -188,20 +198,27 @@ export default function EventDetails() {
                             className="flex items-center space-x-4 p-2 rounded-lg hover:bg-accent"
                         >
                             <div className="flex-grow">
+
+                                <span className="font-medium">{user.email}</span>
+
+
                                 <div className="flex items-center justify-between">
-                                    <span className="font-medium">{user.email}</span>
-                                    {user.role === "creator" && (
-                                        <Badge
-                                            variant="secondary"
-                                            className="rounded-full text-xs"
-                                        >
-                                            Creator
-                                        </Badge>
-                                    )}
+                                    <div className="text-sm text-muted-foreground space-x-2">
+                                        <span>
+                                            {user.name}
+                                        </span>
+
+                                        {user.role === "creator" && (
+                                            <Badge
+                                                variant="secondary"
+                                                className="rounded-full text-xs"
+                                            >
+                                                Creator
+                                            </Badge>
+                                        )}
+                                    </div>
                                 </div>
-                                <div className="text-sm text-muted-foreground">
-                                    {user.name}
-                                </div>
+
                             </div>
                         </li>
                     ))}
