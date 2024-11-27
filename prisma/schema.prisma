@@ -84,10 +84,12 @@ model EventCalculationHistory {
 }
 
 model PushSubscription {
-  id             String  @id @default(cuid())
+  id             String   @id @default(cuid())
   userId         String? // Optional: Link subscription to a user
-  endpoint       String // The endpoint for the subscription
-  p256dh         String // Public key for encryption
-  auth           String // Auth key for encryption
-  expirationTime Int? // Optional: Subscription expiration time
+  endpoint       String   @unique // Mark as unique
+  p256dh         String
+  auth           String
+  expirationTime Int?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 }
