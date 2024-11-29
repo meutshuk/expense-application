@@ -36,8 +36,9 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog";
 import AddExpenseForm from "@/components/add-expense-form";
-import { CalendarDays, DollarSign, User } from "lucide-react";
+import { CalendarDays, DollarSign, ImageIcon, User } from "lucide-react";
 import Image from 'next/image'
+import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
 
 interface InvitedUsers {
     id: string;
@@ -159,12 +160,12 @@ export default async function Page({ params }: Props) {
     if (!event) return;
 
     return (
-        <div className="container mx-auto my-10">
+        <div className="container mx-auto m-10 px-10">
             <div className="flex justify-between items-center">
-                <div className="text-3xl uppercase font-bold" >{event.name}</div>
+                <div className="text-xl md:text-3xl uppercase font-bold" >{event.name}</div>
                 <Sheet>
                     <SheetTrigger asChild>
-                        <Button><User /> Manage Users</Button>
+                        <Button> <User /> <span className="hidden md:block">Manage Users</span></Button>
                     </SheetTrigger>
                     <SheetContent>
                         <SheetHeader>
@@ -200,7 +201,7 @@ export default async function Page({ params }: Props) {
                 </Sheet>
             </div>
             <div>
-                <ScrollArea className=" p-4">
+                <ScrollArea className=" py-4">
                     {event?.expenses.map((expense, index) => {
                         const matchingCalculation = calculationHistory.find(
                             (calculation) => calculation.expenseId === expense.id
@@ -249,10 +250,13 @@ export default async function Page({ params }: Props) {
                                         </DialogHeader>
                                         <Card className="border-0 shadow-none">
                                             <CardHeader className="  flex justify-between flex-row items-center">
-                                                <CardTitle>{expense.name}</CardTitle>
-                                                <CardDescription>
-                                                    {expense.description}
-                                                </CardDescription>
+                                                <div>
+                                                    <CardTitle className="capitalize">{expense.name}</CardTitle>
+                                                    <CardDescription>
+                                                        {expense.description}
+                                                    </CardDescription>
+                                                </div>
+
                                                 <Badge variant="secondary" className="w-fit border border-black items-center justify-center">
                                                     <DollarSign className="mr-1 h-3 w-3" />
                                                     {expense.amount.toFixed(2)}
@@ -317,7 +321,30 @@ export default async function Page({ params }: Props) {
 
                 <Separator className="my-6" />
 
-                <Dialog>
+                <Drawer>
+                    <DrawerTrigger asChild><Button className="w-full">Add Expense</Button></DrawerTrigger>
+
+                    <DrawerContent className="mx-auto w-full">
+                        <DrawerHeader>
+                            <DrawerTitle>Add Expenses</DrawerTitle>
+                            <DrawerDescription>Add expenses and upload image if you have any.</DrawerDescription>
+
+                        </DrawerHeader>
+
+                        <div className=" p-4">
+                            <AddExpenseForm eventId={id} />
+
+                        </div>
+                        <DrawerFooter>
+                            <DrawerClose asChild>
+                                <Button variant="outline">Cancel</Button>
+                            </DrawerClose>
+                        </DrawerFooter>
+
+                    </DrawerContent>
+
+                </Drawer>
+                {/* <Dialog>
                     <DialogTrigger asChild>
                         <Button className="w-full">Add Expense</Button>
                     </DialogTrigger>
@@ -331,7 +358,7 @@ export default async function Page({ params }: Props) {
                         <AddExpenseForm eventId={id} />
                     </DialogContent>
                     <DialogFooter></DialogFooter>
-                </Dialog>
+                </Dialog> */}
             </div>
 
             <div></div>
@@ -353,19 +380,29 @@ const ExpenseBubble = ({
             className={`flex items-start ${isCurrentUser ? "flex-row-reverse" : ""}`}
         >
             {/* <Avatar className="h-8 w-8 mx-2"></Avatar> */}
-            <Card
-                className={`max-w-[70%] px-2 py-2  ${isCurrentUser ? "bg-primary text-primary-foreground" : "bg-secondary"
+            <div
+                className={`max-w-[70%] min-w-44 p-4 rounded-lg space-y-2  ${isCurrentUser ? "bg-primary text-primary-foreground" : "bg-secondary"
                     }`}
             >
-                <CardContent className="p-3">
-                    <p className="font-semibold">{expense.name}</p>
-                    <p className="">{expense.description}</p>
-                    <p className="text-sm">${expense.amount.toFixed(2)}</p>
-                    <p className="text-xs opacity-70">
-                        {new Date(expense.createdAt).toLocaleString()}
-                    </p>
-                </CardContent>
-            </Card>
+
+
+
+                <div>
+                    <div className="flex items-center gap-5">
+                        <p className="font-semibold capitalize">{expense.name}</p>
+                        <span className={expense.imageUrl ? 'block' : 'hidden'}><ImageIcon size={20} /></span>
+                    </div>
+
+                    <p className="text-sm text-muted-foreground">{expense.description}</p>
+
+                </div>
+
+                <p className="text-md font-bold ">${expense.amount.toFixed(2)}</p>
+                <p className="text-xs opacity-70">
+                    {new Date(expense.createdAt).toLocaleString()}
+                </p>
+
+            </div>
         </div>
     </div>
 );

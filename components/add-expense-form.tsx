@@ -16,6 +16,7 @@ import {
 } from "./ui/form";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
+import { ScrollArea } from "./ui/scroll-area";
 
 const formSchema = z.object({
     name: z.string().min(2, {
@@ -78,6 +79,7 @@ export default function AddExpenseForm({ eventId }: { eventId: string }) {
     }
 
     return (
+
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
                 <FormField
@@ -133,7 +135,7 @@ export default function AddExpenseForm({ eventId }: { eventId: string }) {
                             <FormControl>
                                 <Input
                                     type="file"
-                                    accept="image/*"
+                                    accept="image/*,android/force-camera-workaround"
                                     onChange={(e) => onChange(e.target.files)}
                                     {...rest}
                                 />
@@ -145,10 +147,13 @@ export default function AddExpenseForm({ eventId }: { eventId: string }) {
                         </FormItem>
                     )}
                 />
-                <Button type="submit" disabled={isSubmitting}>
+                <Button type="submit" className='w-full' disabled={isSubmitting}>
                     {isSubmitting ? "Adding..." : "Add Expense"}
                 </Button>
             </form>
         </Form>
+
+
+
     );
 }
