@@ -16,7 +16,8 @@ import {
 } from "./ui/form";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
-import { ScrollArea } from "./ui/scroll-area";
+import { useRouter } from 'next/navigation'
+import { TagInput } from "./tag-input";
 
 const formSchema = z.object({
     name: z.string().min(2, {
@@ -35,9 +36,16 @@ const formSchema = z.object({
         .optional(),
 });
 
-export default function AddExpenseForm({ eventId }: { eventId: string }) {
+interface Tag {
+    name: string
+}
+
+export default function AddExpenseForm({ eventId, tags }: { eventId: string, tags: Tag[] }) {
     const { toast } = useToast();
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [selectedTags, setSelectedTags] = useState<string[]>([]);
+
+    const router = useRouter()
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -51,9 +59,14 @@ export default function AddExpenseForm({ eventId }: { eventId: string }) {
     async function onSubmit(values: z.infer<typeof formSchema>) {
         setIsSubmitting(true);
 
+        let tags = selectedTags.map((item) => ({ name: item }));
+
+
+
         const formData = new FormData();
         formData.append("name", values.name);
         formData.append("amount", values.amount.toString());
+        formData.append('tags', JSON.stringify(tags))
         formData.append("description", values.description || '');
         if (values.image && values.image.length > 0) {
             formData.append("image", values.image[0]); // Add the image file
@@ -76,6 +89,10 @@ export default function AddExpenseForm({ eventId }: { eventId: string }) {
             description: "Your expense has been successfully added.",
         });
         form.reset();
+
+        // TODO: figureo out other way to do refresh. maybe concat the
+        router.refresh()
+
     }
 
     return (
@@ -126,6 +143,7 @@ export default function AddExpenseForm({ eventId }: { eventId: string }) {
                         </FormItem>
                     )}
                 />
+                <TagInput availableTags={tags} selectedTags={selectedTags} onTagsChange={setSelectedTags} />
                 <FormField
                     control={form.control}
                     name="image"

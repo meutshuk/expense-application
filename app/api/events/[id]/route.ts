@@ -19,11 +19,14 @@ export async function GET(req: NextRequest, { params }: { params: Param }) {
                                 email: true, // Include other fields as needed
                             },
                         },
+                        tags: true
                     },
                     orderBy: {
                         createdAt: 'asc', // Sort by createdAt in ascending order
                     },
                 },
+                tags: true
+
             },
         });
 

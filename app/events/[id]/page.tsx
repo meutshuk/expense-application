@@ -97,13 +97,20 @@ export default async function Page({ params }: Props) {
                                 email: true, // Include other fields as needed
                             },
                         },
+                        tags: true
+
                     },
                     orderBy: {
                         createdAt: "asc", // Sort by createdAt in ascending order
                     },
+
                 },
+
+                tags: true
+
             },
         });
+
 
         // Fetch calculation history
         const calculationHistory = await prisma.eventCalculationHistory.findMany({
@@ -210,30 +217,7 @@ export default async function Page({ params }: Props) {
                         return (
                             <div key={expense.id}>
 
-                                {/* <Dialog>
-                                    <DialogTrigger asChild>
 
-                                        <ExpenseBubble
-                                            expense={expense}
-                                            isCurrentUser={expense.user.id === session?.user.id}
-                                        />
-
-
-                                    </DialogTrigger>
-
-                                    <DialogContent>
-                                        <DialogHeader>
-                                            <DialogTitle>Expense: {expense.name}</DialogTitle>
-                                            <DialogDescription>
-                                                {expense.description}
-                                            </DialogDescription>
-                                        </DialogHeader>
-                                        <div>
-                                            Amount: <span>{expense.amount}</span>
-                                        </div>
-
-                                    </DialogContent>
-                                </Dialog> */}
 
                                 <Dialog>
                                     <DialogTrigger asChild>
@@ -250,11 +234,22 @@ export default async function Page({ params }: Props) {
                                         </DialogHeader>
                                         <Card className="border-0 shadow-none">
                                             <CardHeader className="  flex justify-between flex-row items-center">
-                                                <div>
-                                                    <CardTitle className="capitalize">{expense.name}</CardTitle>
-                                                    <CardDescription>
-                                                        {expense.description}
-                                                    </CardDescription>
+                                                <div className="space-y-2">
+                                                    <div>
+                                                        <CardTitle className="capitalize">{expense.name}</CardTitle>
+                                                        <CardDescription>
+                                                            {expense.description}
+                                                        </CardDescription>
+                                                    </div>
+
+                                                    <div className="flex flex-wrap gap-3">
+                                                        {
+                                                            expense.tags.map(tag => (
+                                                                <Badge className="capitalize" key={tag.id}>{tag.name}</Badge>
+                                                            ))
+                                                        }
+
+                                                    </div>
                                                 </div>
 
                                                 <Badge variant="secondary" className="w-fit border border-black items-center justify-center">
@@ -332,7 +327,7 @@ export default async function Page({ params }: Props) {
                         </DrawerHeader>
 
                         <div className=" p-4">
-                            <AddExpenseForm eventId={id} />
+                            <AddExpenseForm eventId={id} tags={event.tags} />
 
                         </div>
                         <DrawerFooter>
@@ -344,21 +339,7 @@ export default async function Page({ params }: Props) {
                     </DrawerContent>
 
                 </Drawer>
-                {/* <Dialog>
-                    <DialogTrigger asChild>
-                        <Button className="w-full">Add Expense</Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                        <DialogHeader>
-                            <DialogTitle>Expense</DialogTitle>
-                            <DialogDescription>
-                                Add expenses and upload image if you have any.
-                            </DialogDescription>
-                        </DialogHeader>
-                        <AddExpenseForm eventId={id} />
-                    </DialogContent>
-                    <DialogFooter></DialogFooter>
-                </Dialog> */}
+
             </div>
 
             <div></div>

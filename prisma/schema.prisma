@@ -35,6 +35,7 @@ model Event {
   expenses           Expense[]
   invitedUser        InvitedUser[]
   calculationHistory EventCalculationHistory[]
+  tags               Tags[]                    @relation("EventTags")
 }
 
 model UserEvent {
@@ -71,6 +72,7 @@ model Expense {
   imageUrl           String?
   calculated         Boolean                   @default(false)
   calculationHistory EventCalculationHistory[]
+  tags               Tags[]                    @relation("ExpenseTags")
 }
 
 model EventCalculationHistory {
@@ -93,4 +95,13 @@ model PushSubscription {
   expirationTime Int?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
+}
+
+model Tags {
+  id        String    @id @default(cuid())
+  name      String
+  eventId   String
+  createdAt DateTime  @default(now())
+  events    Event[]   @relation("EventTags")
+  expenses  Expense[] @relation("ExpenseTags")
 }

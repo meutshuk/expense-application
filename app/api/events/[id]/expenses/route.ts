@@ -5,6 +5,7 @@ import { getServerSession } from 'next-auth';
 import { NextRequest, NextResponse } from 'next/server';
 import { v2 as cloudinary, UploadApiErrorResponse, UploadApiResponse } from 'cloudinary';
 import { Readable } from 'stream';
+import { Tags } from '@prisma/client';
 
 
 type UploadResponse =
@@ -38,6 +39,10 @@ const uploadToCloudinary = (
     });
 };
 
+interface Tag {
+    name: string
+}
+
 type Param = Promise<{ id: string }>
 export async function POST(req: NextRequest, { params }: { params: Param }) {
     const { id } = await params;
@@ -50,6 +55,9 @@ export async function POST(req: NextRequest, { params }: { params: Param }) {
     const description = formData.get('description') as string;
     const image = formData.get('image') as File | null;
 
+    const tagsJson = formData.get('tags') as string;
+    const tags = JSON.parse(tagsJson) as Tag[]
+    console.log(tags)
 
 
 
@@ -88,7 +96,51 @@ export async function POST(req: NextRequest, { params }: { params: Param }) {
         }
 
     }
+
     try {
+
+        // Ensure the event exists
+        const event = await prisma.event.findUnique({
+            where: { id: id },
+        });
+
+        if (!event) {
+            return NextResponse.json({ error: 'Event not found' }, { status: 404 });
+        }
+
+        const tagRecords = await Promise.all(
+            tags.map(async (tagName) => {
+                let tag = await prisma.tags.findFirst({
+                    where: { name: tagName.name, eventId: id },
+                });
+
+                if (!tag) {
+                    tag = await prisma.tags.create({
+                        data: {
+                            name: tagName.name,
+                            eventId: id,
+                        },
+                    });
+                }
+
+                // Link tag to the event
+                await prisma.event.update({
+                    where: { id: id },
+                    data: {
+                        tags: {
+                            connect: { id: tag.id },
+                        },
+                    },
+                });
+
+                return tag;
+            })
+        );
+
+        // Filter out any null or undefined tags
+        const validTagRecords = tagRecords.filter((tag) => tag !== null);
+
+
         const expense = await prisma.expense.create({
             data: {
                 name,
@@ -96,7 +148,10 @@ export async function POST(req: NextRequest, { params }: { params: Param }) {
                 amount,
                 eventId: id,
                 addedBy: userId,
-                imageUrl: imageUrl
+                imageUrl: imageUrl,
+                tags: {
+                    connect: tagRecords.map((tag) => ({ id: tag.id })), // Link tags to the expense
+                },
             },
         });
 
@@ -108,7 +163,7 @@ export async function POST(req: NextRequest, { params }: { params: Param }) {
             include: { user: true }, // Include user details
         });
 
-        console.log(eventUsers)
+
 
         // Notify all users except the one who created the expense
         const usersToNotify = eventUsers.filter((userEvent) => userEvent.userId !== userId);
