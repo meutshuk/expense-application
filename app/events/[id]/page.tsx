@@ -242,7 +242,7 @@ export default async function Page({ params }: Props) {
                                                         </CardDescription>
                                                     </div>
 
-                                                    <div className="flex flex-wrap gap-3">
+                                                    <div className="flex flex-wrap gap-1">
                                                         {
                                                             expense.tags.map(tag => (
                                                                 <Badge className="capitalize" key={tag.id}>{tag.name}</Badge>
