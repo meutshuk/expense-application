@@ -1,8 +1,9 @@
 'use client';
 
-import { checkSubscriptionAction, saveSubscription, sendNotification } from '@/app/actions';
+import { checkSubscriptionAction, removeSubscription, saveSubscription, sendNotification } from '@/app/actions';
 import { Bell, BellMinus } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { Button } from './ui/button';
 
 export default function NotificationBell({ userId }: { userId: string }) {
 
@@ -37,40 +38,64 @@ export default function NotificationBell({ userId }: { userId: string }) {
     }, [])
 
 
-    const subscribeToNotifications = async () => {
+    const toggleSubscription = async () => {
         if (!('serviceWorker' in navigator)) {
             alert('Service Worker not supported in this browser.');
             return;
         }
 
         try {
-            // Register service worker
-            const registration = await navigator.serviceWorker.register('/sw.js');
-            console.log(registration)
-            const publicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!;
-            // Subscribe to push notifications
-            const subscription = await registration.pushManager.subscribe({
-                userVisibleOnly: true,
-                applicationServerKey: publicKey,
-            });
-            console.log(subscription)
-            const serializedSubscription = {
-                endpoint: subscription.endpoint,
-                expirationTime: subscription.expirationTime || null,
-                keys: {
-                    p256dh: subscription.getKey('p256dh')
-                        ? btoa(String.fromCharCode(...new Uint8Array(subscription.getKey('p256dh')!)))
-                        : null, // Ensure a fallback value
-                    auth: subscription.getKey('auth')
-                        ? btoa(String.fromCharCode(...new Uint8Array(subscription.getKey('auth')!)))
-                        : null, // Ensure a fallback value
-                },
-            };
 
-            console.log(serializedSubscription)
-            // Save the subscription via server action
-            await saveSubscription(serializedSubscription, userId);
-            setIsSubscribed(true);
+            if (!isSubscribed) {
+
+
+                const registration = await navigator.serviceWorker.register('/sw.js');// Register service worker
+                const publicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!;
+
+                // Subscribe to push notifications
+                const subscription = await registration.pushManager.subscribe({
+                    userVisibleOnly: true,
+                    applicationServerKey: publicKey,
+                });
+
+                const serializedSubscription = {
+                    endpoint: subscription.endpoint,
+                    expirationTime: subscription.expirationTime || null,
+                    keys: {
+                        p256dh: subscription.getKey('p256dh')
+                            ? btoa(String.fromCharCode(...new Uint8Array(subscription.getKey('p256dh')!)))
+                            : null, // Ensure a fallback value
+                        auth: subscription.getKey('auth')
+                            ? btoa(String.fromCharCode(...new Uint8Array(subscription.getKey('auth')!)))
+                            : null, // Ensure a fallback value
+                    },
+                };
+
+                // Save the subscription via server action
+                await saveSubscription(serializedSubscription, userId);
+                setIsSubscribed(true);
+
+            } else {
+                const registration = await navigator.serviceWorker.ready;
+                const subscription = await registration.pushManager.getSubscription();
+
+                if (subscription) {
+                    // Unsubscribe from push notifications
+                    const unsubscribed = await subscription.unsubscribe();
+
+                    if (unsubscribed) {
+
+                        let apple = await removeSubscription(subscription.endpoint, userId)
+                        if (apple.success) {
+                            setIsSubscribed(false);
+                        }
+                    } else {
+                        console.log("Failed to unsubscribe.");
+                    }
+                }
+            }
+
+
         } catch (error) {
             console.error('Subscription error:', error);
         }
@@ -79,16 +104,30 @@ export default function NotificationBell({ userId }: { userId: string }) {
 
 
     return (
-        <div>
+        <div className='flex flex-col justify-center gap-4 items-center'>
 
             {isSubscribed !== null && (
-                <button onClick={subscribeToNotifications} className="p-2 bg-gray-200 rounded-full">
-                    {isSubscribed ? (
-                        <Bell size={24} className="text-green-500" />
-                    ) : (
-                        <BellMinus size={24} className="text-red-500" />
-                    )}
-                </button>
+                <>
+                    <p>This browser is {isSubscribed ? '' : 'not'} subscribed for notification.</p>
+                    <Button onClick={toggleSubscription} className="">
+                        {isSubscribed ? (
+                            <>
+                                <BellMinus size={20} className="" />
+                                <span>Unsubscribe</span>
+                            </>
+
+
+
+                        ) : (
+                            <>
+                                <Bell size={20} className="" />
+                                <span>Subscribe</span>
+                            </>
+
+                        )}
+                    </Button>
+                </>
+
             )}
 
         </div>

@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { PlusCircle } from 'lucide-react';
 import { CreateEventForm } from '@/components/form/createEventFrom';
 import { Drawer, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer';
+import { useRouter } from 'next/navigation';
 
 type Event = {
   id: string;
@@ -24,6 +25,7 @@ export default function HomePage() {
   const { data: session } = useSession();
 
   const [loading, setLoading] = useState(false);
+  let router = useRouter()
 
   const [open, setOpen] = useState(false)
   const isDesktop = useMediaQuery("(min-width: 768px)")
@@ -65,12 +67,17 @@ export default function HomePage() {
         console.error('Error from API:', errorData);
         throw new Error(errorData.error || 'Failed to create event');
       }
+      let data = await response.json()
+
+      setEvents([...events, data])
+
 
     } catch (error) {
       console.error('Error creating event:', error);
     } finally {
       setLoading(false);
       setOpen(false)
+
     }
   };
 

@@ -3,6 +3,8 @@
 import React, { useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import NotificationBell from '@/components/notification';
 
 export default function ProfilePage() {
     const { data: session } = useSession();
@@ -39,43 +41,63 @@ export default function ProfilePage() {
         }
     };
 
+    if (!session) return
+
 
     return (
-        <div className="max-w-md mx-auto mt-8">
-            <h1 className="text-2xl font-bold mb-4">Profile</h1>
-            <p>Email: {session?.user?.email}</p>
+        <div className='container flex mx-auto gap-6 my-6'>
+            <Card className='flex-1 h-fit'>
+                <CardHeader>
+                    <CardTitle>Change Password</CardTitle>
+                    <CardDescription>{session?.user?.email}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <form onSubmit={handleChangePassword} className="">
+                        <h2 className="text-xl font-semibold mb-2">Change Password</h2>
+                        <div className="mb-4">
+                            <label className="block text-sm font-medium text-gray-700">Old Password</label>
+                            <input
+                                type="password"
+                                value={oldPassword}
+                                onChange={(e) => setOldPassword(e.target.value)}
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                required
+                            />
+                        </div>
+                        <div className="mb-4">
+                            <label className="block text-sm font-medium text-gray-700">New Password</label>
+                            <input
+                                type="password"
+                                value={newPassword}
+                                onChange={(e) => setNewPassword(e.target.value)}
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                required
+                            />
+                        </div>
+                        <button
+                            type="submit"
+                            className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700"
+                        >
+                            Change Password
+                        </button>
+                        {error && <p className="text-red-500 mt-2">{error}</p>}
+                        {success && <p className="text-green-500 mt-2">{success}</p>}
+                    </form>
+                </CardContent>
+            </Card>
 
-            <form onSubmit={handleChangePassword} className="mt-6">
-                <h2 className="text-xl font-semibold mb-2">Change Password</h2>
-                <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700">Old Password</label>
-                    <input
-                        type="password"
-                        value={oldPassword}
-                        onChange={(e) => setOldPassword(e.target.value)}
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                        required
-                    />
-                </div>
-                <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700">New Password</label>
-                    <input
-                        type="password"
-                        value={newPassword}
-                        onChange={(e) => setNewPassword(e.target.value)}
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                        required
-                    />
-                </div>
-                <button
-                    type="submit"
-                    className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700"
-                >
-                    Change Password
-                </button>
-                {error && <p className="text-red-500 mt-2">{error}</p>}
-                {success && <p className="text-green-500 mt-2">{success}</p>}
-            </form>
+            <div className='flex-1'>
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Subscription</CardTitle>
+                        <CardDescription>Manage your subscription</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <NotificationBell userId={session?.user.id} />
+                    </CardContent>
+                </Card>
+            </div>
         </div>
+
     );
 }

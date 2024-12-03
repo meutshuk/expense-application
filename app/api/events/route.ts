@@ -27,7 +27,13 @@ export async function POST(req: NextRequest) {
             },
         });
 
-        return NextResponse.json(event); // Return the created event
+        let dToEvent = {
+            event,
+            role: 'creator'
+        }
+
+
+        return NextResponse.json(dToEvent); // Return the created event
     } catch (error) {
         console.error('Error in POST /api/events:', error);
 
@@ -45,23 +51,35 @@ export async function GET(req: NextRequest) {
 
     try {
         // Fetch events linked to the user via the UserEvent table
-        const userEvents = await prisma.userEvent.findMany({
-            where: { userId },
-            include: {
-                event: true, // Include event details
-            },
-        });
+        let eventsWithRole = await getEventsAndMapUsers(userId)
 
-        // Format the response to include event and role information
-        const eventsWithRoles = userEvents.map((userEvent) => ({
-            event: userEvent.event,
-            role: userEvent.role,
-        }));
-
-
-        return NextResponse.json(eventsWithRoles);
+        return NextResponse.json(eventsWithRole);
     } catch (error) {
         console.error('Error fetching events:', error);
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
+}
+
+/**
+ * 
+ * @param userId ID from User Table
+ * @returns Events data and Role 
+ */
+async function getEventsAndMapUsers(userId: string) {
+    // Fetch events linked to the user via the UserEvent table
+    const userEvents = await prisma.userEvent.findMany({
+        where: { userId },
+        include: {
+            event: true, // Include event details
+        },
+    });
+
+    // Format the response to include event and role information
+    const eventsWithRoles = userEvents.map((userEvent) => ({
+        event: userEvent.event,
+        role: userEvent.role,
+    }));
+
+    return eventsWithRoles
+
 }

@@ -8,14 +8,17 @@ import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
+    DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Menu, X, LogOut, Heading, Heading1Icon } from 'lucide-react'
+import { Menu, X, LogOut, CircleUser, User2, } from 'lucide-react'
 import { cn } from "@/lib/utils"
 import { signOut } from 'next-auth/react';
 import NotificationBell from './notification'
 import { User } from 'next-auth'
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from './ui/sheet'
+import { useMediaQuery } from '@/lib/useMediaQuery'
 
 interface Navigation {
     name: string,
@@ -31,18 +34,39 @@ interface Props {
 
 export function Navbar({ userId, user }: Props) {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+    const [isSheetOpen, setIsSheetOpen] = useState(false)
     const pathname = usePathname()
 
+    const isDesktop = useMediaQuery("(min-width: 768px)")
     const handleLogout = async () => {
         await signOut({
             callbackUrl: '/login', // Redirect to the login page after logout
         });
     }
 
+    const UserMenu = () => (
+        <div className="flex flex-col h-full">
+            <SheetHeader>
+                <SheetTitle>User Profile</SheetTitle>
+                <SheetDescription>{user.email}</SheetDescription>
+            </SheetHeader>
+            <div className="flex-grow mt-4">
+                <Link href={'profile'}>
+                    <span>Profile</span>
+                </Link>
+
+
+            </div>
+            <Button onClick={handleLogout} variant="destructive" className="mt-auto">
+                <LogOut className="mr-2 h-4 w-4" /> Logout
+            </Button>
+        </div>
+    )
+
     return (
         <nav className="bg-white shadow-sm">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                <div className="flex h-16 justify-between">
+                <div className="flex h-16 justify-between items-center">
                     <div className="flex">
                         <Link href="/" className="flex flex-shrink-0 items-center">
                             <svg className="h-8 w-auto text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -67,105 +91,49 @@ export function Navbar({ userId, user }: Props) {
                             ))}
                         </div>
                     </div>
-                    <div className="hidden sm:ml-6 sm:flex sm:items-center">
-                        <NotificationBell userId={userId} />
+                    {!isDesktop ? (
+                        <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+                            <SheetTrigger asChild>
+                                <Button variant="ghost" size="icon" className='h-10 w-10'>
+                                    <User2 className="h-10 w-10" />
+                                </Button>
+                            </SheetTrigger>
+                            <SheetContent>
+                                <UserMenu />
+                            </SheetContent>
+                        </Sheet>
+                    ) : (
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                                    <Heading className="h-6 w-6" />
+                                <Button variant="ghost" size="icon">
+                                    <User2 className="h-6 w-6" />
                                 </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                                <DropdownMenuItem disabled>
-                                    <div className="">
-                                        <div className=" text-gray-800">{user.name}</div>
-                                        <div className="text-sm font-medium text-gray-500">{user.email}</div>
-                                    </div>
+                            <DropdownMenuContent align="end" className="w-56">
+                                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                                <DropdownMenuItem>
+                                    <span className="text-sm text-muted-foreground">{user.email}</span>
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
-                                <Link href={`/profile`}> <DropdownMenuItem >Profile</DropdownMenuItem>
+                                <Link href={'profile'}>
+                                    <DropdownMenuItem>
+                                        <span>Profile</span>
+
+                                    </DropdownMenuItem>
+
                                 </Link>
 
-                                <DropdownMenuItem>Settings</DropdownMenuItem>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem onClick={handleLogout}>
                                     <LogOut className="mr-2 h-4 w-4" />
-                                    <span>Log out</span>
+                                    <span>Logout</span>
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
-                    </div>
-                    <div className="-mr-2 flex items-center sm:hidden">
-                        <NotificationBell userId={userId} />
-                        <Button
-                            variant="ghost"
-                            className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
-                            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                        >
-                            <span className="sr-only">Open main menu</span>
-                            {mobileMenuOpen ? (
-                                <X className="block h-6 w-6" aria-hidden="true" />
-                            ) : (
-                                <Menu className="block h-6 w-6" aria-hidden="true" />
-                            )}
-                        </Button>
-                    </div>
+                    )}
                 </div>
             </div>
-            {mobileMenuOpen && (
-                <div className="sm:hidden">
-                    <div className="space-y-1 pb-3 pt-2">
-                        {navigation.map((item) => (
-                            <Link
-                                key={item.name}
-                                href={item.href}
-                                className={cn(
-                                    "block border-l-4 py-2 pl-3 pr-4 text-base font-medium",
-                                    pathname === item.href
-                                        ? "border-indigo-500 bg-indigo-50 text-indigo-700"
-                                        : "border-transparent text-gray-500 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-700"
-                                )}
-                                onClick={() => setMobileMenuOpen(false)}
-                            >
-                                {item.name}
-                            </Link>
-                        ))}
-                    </div>
-                    <div className="border-t border-gray-200 pb-3 pt-4">
-                        <div className="flex items-center px-4">
-                            <div className="flex-shrink-0">
 
-                                <Heading1Icon className="h-8 w-8 rounded-full" />
-                            </div>
-                            <div className="ml-3">
-                                <div className="text-base font-medium text-gray-800">{user.name}</div>
-                                <div className="text-sm font-medium text-gray-500">{user.email}</div>
-                            </div>
-                        </div>
-                        <div className="mt-3 space-y-1">
-                            <Button
-                                variant="ghost"
-                                className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800 w-full text-left"
-                            >
-                                Profile
-                            </Button>
-                            <Button
-                                variant="ghost"
-                                className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800 w-full text-left"
-                            >
-                                Settings
-                            </Button>
-                            <Button
-                                variant="ghost"
-                                className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800 w-full text-left"
-                            >
-                                <LogOut className="inline-block mr-2 h-4 w-4" />
-                                <span>Log out</span>
-                            </Button>
-                        </div>
-                    </div>
-                </div>
-            )}
         </nav>
     )
 }

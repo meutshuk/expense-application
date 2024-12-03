@@ -3,6 +3,21 @@
 import prisma from '@/lib/prisma';
 import webpush from 'web-push';
 
+export async function removeSubscription(subscriptionEndpoint: string, userId?: string) {
+    try {
+        await prisma.pushSubscription.delete({
+            where: {
+                endpoint: subscriptionEndpoint
+            }
+        })
+
+        return { success: true };
+    } catch (error) {
+        console.error('Error saving subscription:', error);
+        return { success: false, error: 'Failed to save subscription' };
+    }
+}
+
 export async function saveSubscription(subscription: {
     endpoint: string;
     expirationTime: number | null;
