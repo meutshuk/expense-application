@@ -1,14 +1,18 @@
 import prisma from '@/lib/prisma';
 import { NextRequest, NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
+import { headers } from 'next/headers';
 
 type Param = Promise<{ id: string }>
 export async function POST(req: NextRequest, { params }: { params: Param }) {
+    const headersList = await headers();
     try {
         const { id: eventId } = await params; // Extract event ID from route params
         const { email } = await req.json(); // Extract email from request body
 
+        let domain = headersList.get('host'); // to get domain
 
+        console.log(domain)
         // Validate input
         if (!email || !eventId) {
             return NextResponse.json({ error: 'Missing email or event ID' }, { status: 400 });
@@ -28,7 +32,7 @@ export async function POST(req: NextRequest, { params }: { params: Param }) {
         });
 
         // Generate the invitation link
-        const inviteLink = `${process.env.VERCEL_URL}/invite/${invite.id}`;
+        const inviteLink = `${domain}/invite/${invite.id}`;
 
         // Log the invitation details
         console.log(`Invite sent to ${email} for event ${eventId}`);

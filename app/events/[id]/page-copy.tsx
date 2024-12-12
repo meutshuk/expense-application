@@ -330,7 +330,7 @@ export default function EventDetails() {
                                             {matchingCalculation && (
                                                 <div className="border-t border-gray-300 my-4">
                                                     <div className="text-sm font-semibold text-muted-foreground">
-                                                        Calculation (Date:{" "}
+                                                        Date:{" "}
                                                         {new Date(matchingCalculation.date).toLocaleDateString()})
                                                     </div>
                                                     <div>App</div>

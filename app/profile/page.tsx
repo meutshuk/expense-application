@@ -45,7 +45,7 @@ export default function ProfilePage() {
 
 
     return (
-        <div className='container flex mx-auto gap-6 my-6'>
+        <div className='container flex flex-col md:flex-row mx-auto  gap-6 p-6'>
             <Card className='flex-1 h-fit'>
                 <CardHeader>
                     <CardTitle>Change Password</CardTitle>

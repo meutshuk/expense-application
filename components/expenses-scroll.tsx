@@ -216,18 +216,31 @@ export default function ExpensesScroll({ event, calculationHistory, userId }: Ev
                         {matchingCalculation && (
                             <div className="border-t border-gray-300 my-4">
                                 <div className="text-sm font-semibold text-muted-foreground">
-                                    Calculation (Date:{" "}
+                                    Date:{" "}
                                     <Date date={matchingCalculation.date} />
 
                                 </div>
                                 <ul>
                                     {matchingCalculation.history && matchingCalculation.history.balances.map(
                                         ({ user, balance }) => (
-                                            <li className="text-xs text-black" key={user.id}>
-                                                User {user.name}:{" "}
-                                                {balance > 0
-                                                    ? `gets $${balance.toFixed(2)}`
-                                                    : `owes $${Math.abs(balance).toFixed(2)}`}
+                                            <li className="text-xs text-black font-bold" key={user.id}>
+                                                <span className='font-normal'>
+                                                    {user.name}:{" "}
+                                                </span>
+                                                {balance > 0 ? (
+                                                    <>
+                                                        <span className="text-green-600">${balance.toFixed(2)}</span>
+                                                    </>
+                                                ) : balance < 0 ? (
+                                                    <>
+                                                        <span className="text-red-400">${Math.abs(balance).toFixed(2)}</span>
+                                                    </>
+                                                ) : (
+                                                    <>
+
+                                                        <span className="text-black">${balance.toFixed(2)}</span>
+                                                    </>
+                                                )}
                                             </li>
                                         )
                                     )}
