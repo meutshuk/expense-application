@@ -14,7 +14,10 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
 import {
     Sheet,
+    SheetClose,
     SheetContent,
+    SheetDescription,
+    SheetFooter,
     SheetHeader,
     SheetTitle,
     SheetTrigger,
@@ -39,6 +42,8 @@ import AddExpenseForm from "@/components/add-expense-form";
 import { CalendarDays, DollarSign, ImageIcon, User } from "lucide-react";
 import Image from 'next/image'
 import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
+import ExpenseScroll from "@/components/expense-scroll";
+import ExpensesScroll from "@/components/expenses-scroll";
 
 interface InvitedUsers {
     id: string;
@@ -116,7 +121,6 @@ export default async function Page({ params }: Props) {
         const calculationHistory = await prisma.eventCalculationHistory.findMany({
             where: { eventId: id },
         });
-
         return { event, calculationHistory };
     }
 
@@ -149,7 +153,6 @@ export default async function Page({ params }: Props) {
 
     let res = await getExpensesAndCalcualtion();
     let event = res.event;
-    console.log(res.calculationHistory);
     const calculationHistory: CalculationHistory[] = res.calculationHistory.map(
         (calculation) => {
             return {
@@ -207,138 +210,38 @@ export default async function Page({ params }: Props) {
                     </SheetContent>
                 </Sheet>
             </div>
-            <div>
-                <ScrollArea className=" py-4">
-                    {event?.expenses.map((expense, index) => {
-                        const matchingCalculation = calculationHistory.find(
-                            (calculation) => calculation.expenseId === expense.id
-                        );
+            <div className="mt-6">
 
-                        return (
-                            <div key={expense.id}>
+                <ExpensesScroll calculationHistory={calculationHistory} event={event} userId={session.user.id} />
 
 
-
-                                <Dialog>
-                                    <DialogTrigger asChild>
-                                        <ExpenseBubble
-                                            expense={expense}
-                                            isCurrentUser={expense.user.id === session?.user.id}
-                                        />
-
-                                    </DialogTrigger>
-                                    <DialogContent className="sm:max-w-[425px]">
-                                        <DialogHeader>
-                                            <DialogTitle>Expense Details</DialogTitle>
-                                            <DialogDescription>View the details of this expense.</DialogDescription>
-                                        </DialogHeader>
-                                        <Card className="border-0 shadow-none">
-                                            <CardHeader className="  flex justify-between flex-row items-center">
-                                                <div className="space-y-2">
-                                                    <div>
-                                                        <CardTitle className="capitalize">{expense.name}</CardTitle>
-                                                        <CardDescription>
-                                                            {expense.description}
-                                                        </CardDescription>
-                                                    </div>
-
-                                                    <div className="flex flex-wrap gap-1">
-                                                        {
-                                                            expense.tags.map(tag => (
-                                                                <Badge className="capitalize" key={tag.id}>{tag.name}</Badge>
-                                                            ))
-                                                        }
-
-                                                    </div>
-                                                </div>
-
-                                                <Badge variant="secondary" className="w-fit border border-black items-center justify-center">
-                                                    <DollarSign className="mr-1 h-3 w-3" />
-                                                    {expense.amount.toFixed(2)}
-                                                </Badge>
-                                            </CardHeader>
-                                            <CardContent className="">
-                                                {
-                                                    expense.imageUrl ?
-                                                        <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg">
-                                                            <Image
-                                                                src={expense.imageUrl}
-                                                                alt={`Receipt for ${expense.name}`}
-                                                                fill
-                                                                className="object-cover"
-                                                            />
-                                                        </div> : ''
-                                                }
-                                            </CardContent>
-                                            <Separator className="my-2" />
-                                            <CardFooter>
-                                                <div className="flex items-center text-sm text-muted-foreground">
-                                                    <CalendarDays className="mr-1 h-4 w-4" />
-                                                    {new Date(expense.createdAt).toLocaleString()}
-                                                </div>
-                                            </CardFooter>
-                                        </Card>
-                                    </DialogContent>
-                                </Dialog>
-                                {matchingCalculation && (
-                                    <div className="border-t border-gray-300 my-4">
-                                        <div className="text-sm font-semibold text-muted-foreground">
-                                            Calculation (Date:{" "}
-                                            {new Date(matchingCalculation.date).toLocaleDateString()})
-                                        </div>
-                                        <ul>
-                                            {matchingCalculation.history.balances.map(
-                                                ({ user, balance }) => (
-                                                    <li className="text-xs text-black" key={user.id}>
-                                                        User {user.name}:{" "}
-                                                        {balance > 0
-                                                            ? `gets $${balance.toFixed(2)}`
-                                                            : `owes $${Math.abs(balance).toFixed(2)}`}
-                                                    </li>
-                                                )
-                                            )}
-                                        </ul>
-                                    </div>
-                                )}
-                            </div>
-                        );
-                    })}
-
-                    {event?.expenses.length === 0 && (
-                        <div>
-                            <h3 className="text-lg font-semibold">No Expenses Found</h3>
-                        </div>
-                    )}
-
-                    {/* <div ref={bottomRef}></div> */}
-                </ScrollArea>
                 <CalculationButton eventId={id} />
 
                 <Separator className="my-6" />
 
-                <Drawer>
-                    <DrawerTrigger asChild><Button className="w-full">Add Expense</Button></DrawerTrigger>
+                <Sheet>
+                    <SheetTrigger asChild><Button className="w-full">Add Expense</Button></SheetTrigger>
 
-                    <DrawerContent className="mx-auto w-full">
-                        <DrawerHeader>
-                            <DrawerTitle>Add Expenses</DrawerTitle>
-                            <DrawerDescription>Add expenses and upload image if you have any.</DrawerDescription>
+                    <SheetContent className="mx-auto w-full">
+                        <SheetHeader>
+                            <SheetTitle>Add Expenses</SheetTitle>
+                            <SheetDescription>Add expenses and upload image if you have any.</SheetDescription>
 
-                        </DrawerHeader>
+                        </SheetHeader>
 
                         <div className=" p-4">
                             <AddExpenseForm eventId={id} tags={event.tags} />
 
                         </div>
-                        <DrawerFooter>
-                            <DrawerClose asChild>
-                                <Button variant="outline">Cancel</Button>
-                            </DrawerClose>
-                        </DrawerFooter>
+                        <SheetFooter>
+                            <SheetClose asChild>
+                                <Button className="w-full m-4" variant="outline">Cancel</Button>
+                            </SheetClose>
+                        </SheetFooter>
 
-                    </DrawerContent>
+                    </SheetContent>
 
-                </Drawer>
+                </Sheet>
 
             </div>
 
@@ -347,46 +250,7 @@ export default async function Page({ params }: Props) {
     );
 }
 
-const ExpenseBubble = ({
-    expense,
-    isCurrentUser,
-}: {
-    expense: Expense;
-    isCurrentUser: boolean;
-}) => (
-    <div
-        className={`flex ${isCurrentUser ? "justify-end" : "justify-start"} mb-4`}
-    >
-        <div
-            className={`flex items-start ${isCurrentUser ? "flex-row-reverse" : ""}`}
-        >
-            {/* <Avatar className="h-8 w-8 mx-2"></Avatar> */}
-            <div
-                className={`max-w-[70%] min-w-44 p-4 rounded-lg space-y-2  ${isCurrentUser ? "bg-primary text-primary-foreground" : "bg-secondary"
-                    }`}
-            >
 
-
-
-                <div>
-                    <div className="flex items-center gap-5">
-                        <p className="font-semibold capitalize">{expense.name}</p>
-                        <span className={expense.imageUrl ? 'block' : 'hidden'}><ImageIcon size={20} /></span>
-                    </div>
-
-                    <p className="text-sm text-muted-foreground">{expense.description}</p>
-
-                </div>
-
-                <p className="text-md font-bold ">${expense.amount.toFixed(2)}</p>
-                <p className="text-xs opacity-70">
-                    {new Date(expense.createdAt).toLocaleString()}
-                </p>
-
-            </div>
-        </div>
-    </div>
-);
 
 const UserList = ({ users }: { users: InvitedUsers[] }) => (
     <ul>
