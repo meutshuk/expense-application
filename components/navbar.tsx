@@ -115,7 +115,7 @@ export function Navbar({ userId, user }: Props) {
                                     <span className="text-sm text-muted-foreground">{user.email}</span>
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
-                                <Link href={'profile'}>
+                                <Link href={'/profile'}>
                                     <DropdownMenuItem>
                                         <span>Profile</span>
 
