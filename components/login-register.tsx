@@ -75,11 +75,10 @@ export default function LoginRegister({ defaultTab = 'login', defaultEmail = '',
             password: values.password,
         });
 
-        console.log(result)
+
 
         if (result?.error) {
         } else {
-            console.log(callbackUrl)
             window.location.href = callbackUrl; // Redirect after successful login
 
         }

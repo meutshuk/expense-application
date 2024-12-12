@@ -22,7 +22,6 @@ export function TagInput({ availableTags, selectedTags, onTagsChange }: TagInput
     const inputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
-        console.log(availableTags)
     }, [availableTags])
 
     useEffect(() => {

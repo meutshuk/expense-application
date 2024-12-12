@@ -57,7 +57,7 @@ export async function POST(req: NextRequest, { params }: { params: Param }) {
 
     const tagsJson = formData.get('tags') as string;
     const tags = JSON.parse(tagsJson) as Tag[]
-    console.log(tags)
+
 
 
 
@@ -155,7 +155,7 @@ export async function POST(req: NextRequest, { params }: { params: Param }) {
             },
         });
 
-        console.log(expense)
+
 
         // Fetch users related to the event
         const eventUsers = await prisma.userEvent.findMany({
@@ -168,8 +168,6 @@ export async function POST(req: NextRequest, { params }: { params: Param }) {
         // Notify all users except the one who created the expense
         const usersToNotify = eventUsers.filter((userEvent) => userEvent.userId !== userId);
 
-        console.log(usersToNotify)
-        console.log(eventUsers)
         for (const { user } of usersToNotify) {
             await sendNotification(user.id, `New expense added: ${name} ($${amount})`);
         }

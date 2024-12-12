@@ -189,16 +189,18 @@ export default function ExpensesScroll({ event, calculationHistory, userId }: Ev
                                     </CardHeader>
                                     <CardContent className="">
                                         {
-                                            expense.imageUrl ?
-                                                <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg">
+                                            expense.imageUrl ? (
+                                                <div className="relative w-full h-64 overflow-hidden rounded-lg">
                                                     <Image
                                                         src={expense.imageUrl}
                                                         alt={`Receipt for ${expense.name}`}
                                                         fill
                                                         className="object-cover"
                                                     />
-                                                </div> : ''
+                                                </div>
+                                            ) : ''
                                         }
+
                                     </CardContent>
                                     <Separator className="my-2" />
                                     <CardFooter>

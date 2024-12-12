@@ -27,12 +27,11 @@ export async function saveSubscription(subscription: {
     };
 }, userId?: string) {
 
-    console.log(subscription)
     if (!subscription || !subscription.endpoint || !subscription.keys) {
-        console.log("first")
+
         throw new Error('Invalid subscription payload');
     }
-    console.log("first")
+
     try {
         await prisma.pushSubscription.upsert({
             where: { endpoint: subscription.endpoint },
