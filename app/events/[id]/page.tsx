@@ -42,7 +42,6 @@ import AddExpenseForm from "@/components/add-expense-form";
 import { CalendarDays, DollarSign, ImageIcon, User } from "lucide-react";
 import Image from 'next/image'
 import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
-import ExpenseScroll from "@/components/expense-scroll";
 import ExpensesScroll from "@/components/expenses-scroll";
 
 interface InvitedUsers {
