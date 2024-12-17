@@ -113,15 +113,25 @@ export default function LoginRegister({ defaultTab = 'login', defaultEmail = '',
                 title: 'Successfully Registered'
 
             })
+            const login = await signIn('credentials', {
+                redirect: true,
+                email: values.email,
+                password: values.password
+            })
+
+            if (login?.ok) {
+                router.push('/')
+            }
+
+        } else {
+            toast({
+                variant: 'destructive',
+                title: 'Error while registering user'
+
+            })
         }
-        const login = await signIn('credentials', {
-            redirect: true,
-            email: values.email,
-            password: values.password
-        })
-        if (login?.ok) {
-            router.push('/')
-        }
+
+
         setIsLoading(false);
 
 
