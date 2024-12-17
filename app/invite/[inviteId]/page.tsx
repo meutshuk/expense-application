@@ -35,7 +35,6 @@ const InvitePage = () => {
     useEffect(() => {
         const fetchInvite = async () => {
             try {
-                // Fetch the invite details
                 const inviteResponse = await fetch(`/api/invite/${inviteId}`);
                 if (!inviteResponse.ok) {
                     throw new Error('Invalid or expired invite');
@@ -43,19 +42,17 @@ const InvitePage = () => {
                 const inviteData = await inviteResponse.json();
                 setInvite(inviteData);
 
-
-
                 if (status === 'authenticated' && session?.user) {
-                    // Check if the logged-in user's email matches the invited email
                     if (session.user.email !== inviteData.email) {
                         throw new Error('This invite is not for the currently logged-in user.');
                     }
-
-                    setLoading(false); // Stop loading, user is logged in and matches invite
                 } else if (status === 'unauthenticated') {
-                    // Redirect to login or register if not authenticated
-                    router.push(`/login?callbackUrl=/invite/${inviteId}&email=${inviteData?.email}`);
+                    // Wait to fetch invite data before redirect
+                    console.log('Redirecting to login...');
+                    router.push(`/login?callbackUrl=/invite/${inviteId}&email=${inviteData.email}`);
                 }
+
+                setLoading(false);
             } catch (err) {
                 setError((err as Error).message || 'An error occurred while processing the invite.');
                 setLoading(false);

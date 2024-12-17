@@ -10,6 +10,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { signIn } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 
 const loginSchema = z.object({
     email: z.string().email({ message: "Invalid email address" }),
@@ -31,10 +33,19 @@ interface LoginRegisterProps {
     inviteId?: string
 }
 
-export default function LoginRegister({ defaultTab = 'login', defaultEmail = '', callbackUrl = '/', inviteId = '' }: LoginRegisterProps) {
+export default function LoginRegister({ defaultTab = 'login', defaultEmail = '', callbackUrl, inviteId = '' }: LoginRegisterProps) {
+
+
+    const router = useRouter();
+    const searchParams = useSearchParams()
+
+    callbackUrl = callbackUrl || searchParams.get('callbackUrl') || '/'
+
     const [isLoading, setIsLoading] = useState(false)
     const [message, setMessage] = useState('')
     const [activeTab, setActiveTab] = useState(defaultTab)
+
+
 
     const loginForm = useForm<z.infer<typeof loginSchema>>({
         resolver: zodResolver(loginSchema),
@@ -79,7 +90,7 @@ export default function LoginRegister({ defaultTab = 'login', defaultEmail = '',
 
         if (result?.error) {
         } else {
-            window.location.href = callbackUrl; // Redirect after successful login
+            window.location.href = callbackUrl // Redirect after successful login
 
         }
     };
