@@ -21,23 +21,9 @@ import { CalendarDays, DollarSign, ImageIcon } from 'lucide-react';
 import { Badge } from './ui/badge';
 import Image from 'next/image'
 import { Separator } from './ui/separator';
-import { format } from 'date-fns';
-import { Button } from './ui/button';
 import Date from './date';
 
-// export const formatDate = (date: Date | string) => {
-//     const parsedDate = new Date(date);
 
-//     return new Intl.DateTimeFormat('en-GB', {
-//         day: '2-digit',
-//         month: '2-digit',
-//         year: 'numeric',
-//         hour: '2-digit',
-//         minute: '2-digit',
-//         second: '2-digit',
-//         hour12: false
-//     }).format(parsedDate);
-// };
 
 interface EventDisplayProps {
     event: Prisma.EventGetPayload<{
@@ -190,14 +176,17 @@ export default function ExpensesScroll({ event, calculationHistory, userId }: Ev
                                     <CardContent className="">
                                         {
                                             expense.imageUrl ? (
-                                                <div className="relative w-full h-64 overflow-hidden rounded-lg">
+                                                <div className="relative w-full overflow-hidden rounded-lg">
                                                     <Image
                                                         src={expense.imageUrl}
                                                         alt={`Receipt for ${expense.name}`}
-                                                        fill
-                                                        className="object-cover"
+                                                        width={0} // Let Next.js handle width
+                                                        height={0} // Let Next.js handle height dynamically
+                                                        sizes="100vw" // Responsive width
+                                                        className="w-full h-auto object-cover"
                                                     />
                                                 </div>
+
                                             ) : ''
                                         }
 
