@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button"
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useSearchParams } from 'next/navigation'
+import { useToast } from '@/hooks/use-toast'
 
 const loginSchema = z.object({
     email: z.string().email({ message: "Invalid email address" }),
@@ -35,7 +36,7 @@ interface LoginRegisterProps {
 
 export default function LoginRegister({ defaultTab = 'login', defaultEmail = '', callbackUrl, inviteId = '' }: LoginRegisterProps) {
 
-
+    const { toast } = useToast()
     const router = useRouter();
     const searchParams = useSearchParams()
 
@@ -104,7 +105,23 @@ export default function LoginRegister({ defaultTab = 'login', defaultEmail = '',
             body: JSON.stringify({ name: values.name, email: values.email, password: values.password, inviteId }),
         });
 
+
         const result = await response.json();
+        if (response.ok) {
+            registerForm.reset()
+            toast({
+                title: 'Successfully Registered'
+
+            })
+        }
+        const login = await signIn('credentials', {
+            redirect: true,
+            email: values.email,
+            password: values.password
+        })
+        if (login?.ok) {
+            router.push('/')
+        }
         setIsLoading(false);
 
 
