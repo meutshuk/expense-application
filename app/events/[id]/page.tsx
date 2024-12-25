@@ -1,12 +1,9 @@
 import React from "react";
 import prisma from "@/lib/prisma";
-import { ScrollArea } from "@radix-ui/react-scroll-area";
-import { Expense } from "@prisma/client";
 import {
     Card,
     CardContent,
     CardDescription,
-    CardFooter,
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
@@ -23,25 +20,12 @@ import {
     SheetTrigger,
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Input } from "postcss";
 import { Badge } from "@/components/ui/badge";
 import InviteUserForm from "@/components/invite-user-form";
-import useSWR from "swr";
 import CalculationButton from "@/components/calculation-button";
 import { Separator } from "@/components/ui/separator";
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog";
 import AddExpenseForm from "@/components/add-expense-form";
-import { CalendarDays, DollarSign, ImageIcon, User } from "lucide-react";
-import Image from 'next/image'
-import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
+import { User } from "lucide-react";
 import ExpensesScroll from "@/components/expenses-scroll";
 
 interface InvitedUsers {
@@ -68,15 +52,7 @@ interface Balances {
     user: BasicUserInfo;
 }
 
-interface Test {
-    balances: {
-        user: {
-            id: string;
-            name: string;
-        };
-        balance: number;
-    }[];
-}
+
 
 interface Props {
     params: Promise<{ id: string }>;

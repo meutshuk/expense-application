@@ -80,6 +80,8 @@ export default function AddExpenseForm({ eventId, tags }: { eventId: string, tag
         if (!response.ok) {
             setIsSubmitting(false);
             form.reset();
+            form.setValue("image", undefined);
+
             throw new Error("Failed to add expense");
         }
 
