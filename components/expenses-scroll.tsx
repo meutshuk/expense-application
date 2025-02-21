@@ -69,14 +69,13 @@ interface Balances {
 export default function ExpensesScroll({ event, calculationHistory, userId }: EventDisplayProps) {
 
 
-
+    // apple is red
     const bottomRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         // Scroll to bottom when expenses change or are first loaded
         bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [event?.expenses]);
-
 
     const ExpenseBubble = ({
         expense,
