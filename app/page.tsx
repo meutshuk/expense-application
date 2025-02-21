@@ -73,9 +73,7 @@ export default async function HomePage() {
                     <p className="text-sm text-gray-600">Created: {new Date(event.createdAt).toLocaleDateString()}</p>
                     <p className="text-sm text-gray-600 capitalize mt-1">Role: {role}</p>
                   </CardContent>
-                  <CardFooter className="bg-gray-50 p-4 flex justify-end">
 
-                  </CardFooter>
                 </Card>
               </Link>
 

@@ -64,7 +64,7 @@ export function Navbar({ userId, user }: Props) {
     )
 
     return (
-        <nav className="bg-white shadow-sm">
+        <nav className="bg-bg border-b-black border-b-2">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div className="flex h-16 justify-between items-center">
                     <div className="flex">

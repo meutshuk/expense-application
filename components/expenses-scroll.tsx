@@ -85,43 +85,48 @@ export default function ExpensesScroll({ event, calculationHistory, userId }: Ev
         expense: Expense;
         isCurrentUser: boolean;
     }) => (
-        <div
-            className={`flex ${isCurrentUser ? "justify-end" : "justify-start"} mb-4`}
-        >
-            <div
-                className={`flex items-start ${isCurrentUser ? "flex-row-reverse" : ""}`}
-            >
-                {/* <Avatar className="h-8 w-8 mx-2"></Avatar> */}
+        <Card className={`max-w-fit flex ${isCurrentUser ? "justify-end" : "justify-start"} mb-4`}>
+            <CardContent>
+
+
                 <div
-                    className={`max-w-[70%] min-w-44 p-4 rounded-lg space-y-2  ${isCurrentUser ? "bg-primary text-primary-foreground" : "bg-secondary"
-                        }`}
+                    className={`flex items-start  ${isCurrentUser ? "flex-row-reverse" : ""}`}
                 >
+                    {/* <Avatar className="h-8 w-8 mx-2"></Avatar> */}
+                    <div
+                        className={`max-w-[70%] min-w-44 p-4 rounded-lg space-y-2  ${isCurrentUser ? "bg-primary text-primary-foreground" : "bg-secondary"
+                            }`}
+                    >
 
 
 
-                    <div>
-                        <div className="flex items-center gap-5">
-                            <p className="font-semibold capitalize">{expense.name}</p>
-                            <span className={expense.imageUrl ? 'block' : 'hidden'}><ImageIcon size={20} /></span>
+                        <div>
+                            <div className="flex items-center gap-5">
+                                <p className="font-semibold capitalize">{expense.name}</p>
+                                <span className={expense.imageUrl ? 'block' : 'hidden'}><ImageIcon size={20} /></span>
+                            </div>
+
+                            <p className="text-sm text-muted-foreground">{expense.description}</p>
+
                         </div>
 
-                        <p className="text-sm text-muted-foreground">{expense.description}</p>
+                        <p className="text-md font-bold ">${expense.amount.toFixed(2)}</p>
+                        <p className="text-xs opacity-70">
+
+                            <Date date={expense.createdAt} />
+                        </p>
 
                     </div>
-
-                    <p className="text-md font-bold ">${expense.amount.toFixed(2)}</p>
-                    <p className="text-xs opacity-70">
-
-                        <Date date={expense.createdAt} />
-                    </p>
-
                 </div>
-            </div>
-        </div>
+
+            </CardContent>
+
+        </Card>
+
     );
 
     return (
-        <div className="max-h-[70vh] overflow-scroll py-4">
+        <div className="max-h-[70vh] overflow-scroll ">
 
             {event?.expenses.map((expense, index) => {
                 const matchingCalculation = calculationHistory.find(
@@ -133,14 +138,14 @@ export default function ExpensesScroll({ event, calculationHistory, userId }: Ev
 
 
 
-                        <Dialog>
+                        <Dialog >
                             <DialogTrigger asChild>
-                                <div>
-                                    <ExpenseBubble
-                                        expense={expense}
-                                        isCurrentUser={expense.user.id === userId}
-                                    />
-                                </div>
+
+                                <ExpenseBubble
+                                    expense={expense}
+                                    isCurrentUser={expense.user.id === userId}
+                                />
+
 
                             </DialogTrigger>
                             <DialogContent className="">
@@ -168,7 +173,7 @@ export default function ExpensesScroll({ event, calculationHistory, userId }: Ev
                                             </div>
                                         </div>
 
-                                        <Badge variant="secondary" className="w-fit border border-black items-center justify-center">
+                                        <Badge variant="default" className="w-fit border border-black items-center justify-center">
                                             <DollarSign className="mr-1 h-3 w-3" />
                                             {expense.amount.toFixed(2)}
                                         </Badge>
